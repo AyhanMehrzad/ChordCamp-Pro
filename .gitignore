@@ -6,6 +6,7 @@ package-lock.json
 dist/
 build/
 *.tmp
+installer/ChordCampPayload.zip
 
 # Operating System Files
 .DS_Store

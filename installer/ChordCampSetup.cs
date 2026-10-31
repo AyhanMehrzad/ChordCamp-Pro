@@ -1,9 +1,10 @@
 using System;
 using System.Drawing;
 using System.IO;
+using System.IO.Compression;
 using System.Diagnostics;
+using System.Reflection;
 using System.Windows.Forms;
-using System.Runtime.InteropServices;
 
 namespace ChordCampInstaller
 {
@@ -30,7 +31,7 @@ namespace ChordCampInstaller
 
         public InstallerForm()
         {
-            this.Text = "ChordCamp Pro — Installer";
+            this.Text = "ChordCamp Pro — Windows Setup";
             this.Size = new Size(520, 390);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.StartPosition = FormStartPosition.CenterScreen;
@@ -137,6 +138,7 @@ namespace ChordCampInstaller
             progressBar.Visible = true;
             progressBar.Value = 10;
             lblStatus.Text = "Preparing installation...";
+            Application.DoEvents();
 
             try
             {
@@ -152,24 +154,66 @@ namespace ChordCampInstaller
                 }
 
                 progressBar.Value = 30;
-                lblStatus.Text = "Copying ChordCamp Pro application files...";
+                lblStatus.Text = "Extracting ChordCamp Pro application payload...";
+                Application.DoEvents();
 
-                // Determine source folder (where installer is running or adjacent folder)
-                string currentDir = AppDomain.CurrentDomain.BaseDirectory;
-                string sourceDir = currentDir;
-                if (!File.Exists(Path.Combine(sourceDir, "index.html")))
+                // 1. Try to extract from embedded resource payload
+                bool extracted = false;
+                Assembly asm = Assembly.GetExecutingAssembly();
+                string resourceName = "ChordCampPayload.zip";
+
+                using (Stream stream = asm.GetManifestResourceStream(resourceName))
                 {
-                    string parent = Directory.GetParent(currentDir).FullName;
-                    if (File.Exists(Path.Combine(parent, "index.html")))
+                    if (stream != null)
                     {
-                        sourceDir = parent;
+                        string tempZip = Path.Combine(Path.GetTempPath(), "ChordCampPayload_" + Guid.NewGuid().ToString("N") + ".zip");
+                        using (FileStream fs = new FileStream(tempZip, FileMode.Create, FileAccess.Write))
+                        {
+                            byte[] buffer = new byte[65536];
+                            int read;
+                            while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
+                            {
+                                fs.Write(buffer, 0, read);
+                            }
+                        }
+
+                        // Extract using ZipFile
+                        ExtractZipOverwrite(tempZip, targetDir);
+
+                        try { File.Delete(tempZip); } catch { }
+                        extracted = true;
                     }
                 }
 
-                CopyDirectory(sourceDir, targetDir);
+                // 2. Fallback to adjacent directory copy if running locally from source
+                if (!extracted)
+                {
+                    string currentDir = AppDomain.CurrentDomain.BaseDirectory;
+                    string sourceDir = currentDir;
+                    if (!File.Exists(Path.Combine(sourceDir, "index.html")))
+                    {
+                        string parent = Directory.GetParent(currentDir).FullName;
+                        if (File.Exists(Path.Combine(parent, "index.html")))
+                        {
+                            sourceDir = parent;
+                        }
+                    }
 
-                progressBar.Value = 70;
+                    if (File.Exists(Path.Combine(sourceDir, "index.html")))
+                    {
+                        CopyDirectory(sourceDir, targetDir);
+                        extracted = true;
+                    }
+                }
+
+                if (!extracted)
+                {
+                    throw new Exception("Application payload not found inside installer or adjacent directory.");
+                }
+
+                progressBar.Value = 75;
                 lblStatus.Text = "Creating Windows shortcuts...";
+                Application.DoEvents();
 
                 string exePath = Path.Combine(targetDir, "ChordCamp.exe");
                 string iconPath = Path.Combine(targetDir, "assets", "ChordCamp.ico");
@@ -196,10 +240,9 @@ namespace ChordCampInstaller
                     "echo Removing desktop shortcuts...\r\n" +
                     "del /q \"%USERPROFILE%\\Desktop\\ChordCamp Pro.lnk\" 2>nul\r\n" +
                     "del /q \"%APPDATA%\\Microsoft\\Windows\\Start Menu\\Programs\\ChordCamp Pro.lnk\" 2>nul\r\n" +
-                    "echo Removing files...\r\n" +
-                    "timeout /t 2 >nul\r\n" +
+                    "echo Removing application files...\r\n" +
                     "cd ..\r\n" +
-                    "rmdir /s /q \"" + targetDir + "\"\r\n" +
+                    "rmdir /s /q \"" + targetDir + "\" 2>nul\r\n" +
                     "echo ChordCamp Pro has been removed successfully.\r\n" +
                     "pause\r\n"
                 );
@@ -226,7 +269,27 @@ namespace ChordCampInstaller
                 progressBar.Visible = false;
                 btnInstall.Enabled = true;
                 lblStatus.Text = "Installation failed: " + ex.Message;
-                MessageBox.Show("Error: " + ex.Message, "Install Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Error during installation: " + ex.Message, "Install Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private static void ExtractZipOverwrite(string zipPath, string targetDir)
+        {
+            using (ZipArchive archive = ZipFile.OpenRead(zipPath))
+            {
+                foreach (ZipArchiveEntry entry in archive.Entries)
+                {
+                    string fullPath = Path.Combine(targetDir, entry.FullName);
+                    if (string.IsNullOrEmpty(entry.Name))
+                    {
+                        Directory.CreateDirectory(fullPath);
+                    }
+                    else
+                    {
+                        Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
+                        entry.ExtractToFile(fullPath, true);
+                    }
+                }
             }
         }
 
@@ -234,7 +297,7 @@ namespace ChordCampInstaller
         {
             if (string.Equals(Path.GetFullPath(source).TrimEnd('\\'), Path.GetFullPath(target).TrimEnd('\\'), StringComparison.OrdinalIgnoreCase))
             {
-                return; // Already in target directory
+                return;
             }
 
             Directory.CreateDirectory(target);
@@ -282,14 +345,13 @@ namespace ChordCampInstaller
                 shortcut.WorkingDirectory = workingDir;
                 if (File.Exists(iconPath))
                 {
-                    shortcut.IconLocation = iconPath + ", 0";
+                    shortcut.IconLocation = iconPath + ",0";
                 }
                 shortcut.Description = description;
                 shortcut.Save();
             }
             catch (Exception)
             {
-                // Fallback: non-fatal if shortcut cannot be written
             }
         }
     }
