@@ -36,7 +36,8 @@ function setQualityFilter(quality) {
 
 function toggleGlobalEasyMode() {
   useEasyShapes = !useEasyShapes;
-  document.getElementById('easyStateText').textContent = useEasyShapes ? 'ON' : 'OFF';
+  const easyBtnText = document.getElementById('easyStateText');
+  if (easyBtnText) easyBtnText.textContent = useEasyShapes ? 'ON' : 'OFF';
   selectChord(activeChordName, true);
   renderChordGrid();
   toast(useEasyShapes ? '✨ Beginner Easy Shapes enabled!' : '🎸 Standard barre/open shapes enabled');

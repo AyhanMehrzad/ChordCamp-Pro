@@ -1,5 +1,5 @@
 // ChordCamp Pro - 100% Offline Service Worker (Cache-First Strategy)
-const CACHE_NAME = 'chordcamp-pro-v1';
+const CACHE_NAME = 'chordcamp-pro-v2';
 
 const OFFLINE_URLS = [
   './',

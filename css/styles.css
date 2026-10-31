@@ -1378,57 +1378,58 @@ button:active {
 }
 
 /* ========================================================
-   FLOATING STUDIO DOCK (BALANCED CAPSULE - ZERO EMPTY VOIDS)
+   FLOATING STUDIO DOCK (BALANCED CAPSULE • ZERO EMPTY VOIDS)
    ======================================================== */
 .thumb-dock {
   position: fixed;
-  bottom: 18px;
+  bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 100;
   width: fit-content;
   max-width: calc(100vw - 24px);
   background: rgba(13, 20, 15, 0.94);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
   border: 1px solid rgba(216, 255, 101, 0.32);
   border-radius: 999px;
-  padding: 6px 10px;
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.85), 0 0 25px rgba(216, 255, 101, 0.12);
-  display: flex;
+  padding: 5px 8px;
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.85), 0 0 25px rgba(216, 255, 101, 0.12);
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
+  user-select: none;
   transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .thumb-dock:hover {
   border-color: rgba(216, 255, 101, 0.5);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 32px rgba(216, 255, 101, 0.18);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.9), 0 0 32px rgba(216, 255, 101, 0.18);
 }
 
 .dock-hubs {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   background: rgba(8, 13, 9, 0.7);
   padding: 3px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .dock-hub-btn {
   background: transparent;
   border: 1px solid transparent;
   color: var(--muted);
-  padding: 6px 14px;
+  padding: 6px 12px;
   border-radius: 999px;
   font-size: 11.5px;
   font-weight: 700;
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   cursor: pointer;
   transition: all 0.16s ease;
   white-space: nowrap;
@@ -1436,19 +1437,19 @@ button:active {
 
 .dock-hub-btn:hover {
   color: var(--text);
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .dock-hub-btn.active {
   background: var(--lime);
-  color: #0d180b !important;
+  color: #0b1509 !important;
   font-weight: 800;
   box-shadow: 0 2px 10px rgba(216, 255, 101, 0.35);
 }
 
 .dock-divider {
   width: 1px;
-  height: 28px;
+  height: 24px;
   background: rgba(216, 255, 101, 0.2);
   margin: 0 2px;
 }
@@ -1460,17 +1461,17 @@ button:active {
 }
 
 .dock-btn {
-  background: rgba(22, 32, 23, 0.85);
+  background: rgba(22, 33, 23, 0.85);
   border: 1px solid var(--line-bright);
   color: var(--text);
-  padding: 8px 14px;
+  padding: 7px 13px;
   border-radius: 999px;
   font-size: 12px;
   font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 6px;
-  min-height: 38px;
+  gap: 5px;
+  min-height: 36px;
   cursor: pointer;
   transition: all 0.16s ease;
   white-space: nowrap;
@@ -1478,29 +1479,36 @@ button:active {
 
 .dock-btn:hover {
   border-color: var(--lime);
-  background: rgba(30, 44, 32, 0.95);
+  background: rgba(30, 45, 32, 0.95);
   transform: translateY(-1px);
 }
 
 .dock-btn.active {
   background: var(--lime);
-  color: #0e190b !important;
+  color: #0c180a !important;
   border-color: var(--lime);
-  box-shadow: 0 3px 12px rgba(216, 255, 101, 0.35);
+  box-shadow: 0 2px 12px rgba(216, 255, 101, 0.35);
+}
+
+#dockDroneBtn.active {
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+  color: #ffffff !important;
+  border-color: #c084fc;
+  box-shadow: 0 2px 14px rgba(168, 85, 247, 0.5);
 }
 
 .dock-strum-btn {
-  background: linear-gradient(135deg, #d8ff65 0%, #b4f028 100%);
-  color: #0b1509;
+  background: linear-gradient(135deg, #d8ff65 0%, #a4ee18 100%);
+  color: #081205;
   border: 0;
-  padding: 8px 18px;
+  padding: 7px 16px;
   border-radius: 999px;
   font-weight: 800;
   font-size: 12.5px;
-  min-height: 38px;
+  min-height: 36px;
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
   box-shadow: 0 4px 18px rgba(216, 255, 101, 0.45);
   cursor: pointer;
   transition: all 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -1770,12 +1778,12 @@ button:active {
     border: none !important;
     border-radius: 0 !important;
     box-shadow: none !important;
-    padding: 14px 14px 105px !important;
+    padding: 14px 14px 115px !important;
   }
 }
 
 @media (max-width: 640px) {
-  .shell { padding: 12px 10px 100px !important; }
+  .shell { padding: 12px 10px 115px !important; }
   .nav { margin-bottom: 12px; }
   .nav-actions {
     width: 100%;
@@ -1825,51 +1833,78 @@ button:active {
     grid-template-columns: 1fr;
   }
   .thumb-dock {
-    width: calc(100vw - 16px);
-    max-width: 100%;
-    bottom: 8px;
-    padding: 6px 8px;
-    border-radius: 20px;
-    justify-content: space-between;
-    gap: 4px;
+    width: fit-content;
+    max-width: calc(100vw - 16px);
+    bottom: 12px;
+    padding: 5px 7px;
+    border-radius: 999px;
+    justify-content: center;
+    gap: 6px;
   }
   .dock-hubs {
-    background: transparent;
-    border: none;
-    padding: 0;
+    background: rgba(8, 13, 9, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 2px;
     gap: 2px;
   }
   .dock-hub-btn {
-    flex-direction: column;
-    padding: 5px 6px;
-    min-width: 42px;
-    font-size: 10px;
-    gap: 2px;
-    border-radius: 12px;
+    flex-direction: row;
+    padding: 5px 9px;
+    min-width: auto;
+    font-size: 11px;
+    gap: 4px;
+    border-radius: 999px;
   }
   .dock-hub-btn span.label {
-    display: block;
-    font-size: 9px;
+    display: inline;
+    font-size: 10.5px;
   }
   .dock-actions {
     gap: 4px;
   }
   .dock-btn {
-    padding: 7px 10px;
+    padding: 6px 10px;
     font-size: 11px;
-    min-height: 38px;
-    border-radius: 14px;
+    min-height: 35px;
+    border-radius: 999px;
   }
   .dock-strum-btn {
-    padding: 7px 12px;
-    font-size: 11px;
-    min-height: 38px;
-    border-radius: 14px;
+    padding: 6px 13px;
+    font-size: 11.5px;
+    min-height: 35px;
+    border-radius: 999px;
   }
-  .dock-btn span.hide-sm { display: none; }
+  .dock-btn span.hide-sm { display: inline; }
   .chord-sheet-modal {
     max-width: 100%;
     border-radius: 24px 24px 0 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .thumb-dock {
+    gap: 4px;
+    padding: 4px 6px;
+    bottom: 8px;
+  }
+  .dock-hub-btn {
+    padding: 5px 7px;
+    font-size: 10px;
+    gap: 3px;
+  }
+  .dock-hub-btn span.label {
+    font-size: 9.5px;
+  }
+  .dock-btn {
+    padding: 5px 8px;
+    font-size: 10.5px;
+  }
+  .dock-btn span.hide-sm {
+    display: none;
+  }
+  .dock-strum-btn {
+    padding: 5px 10px;
+    font-size: 11px;
   }
 }
 
@@ -1879,9 +1914,33 @@ button:active {
     gap: 8px;
   }
   .card-title { font-size: 19px; }
-  .dock-actions { gap: 4px; }
-  .dock-hub-btn { padding: 5px 6px; min-width: 38px; }
-  .dock-hub-btn span.label { display: none; }
-  .dock-btn { padding: 6px 8px; }
-  .dock-strum-btn { padding: 6px 9px; }
+  .thumb-dock {
+    gap: 3px;
+    padding: 3px 5px;
+    bottom: 6px;
+  }
+  .dock-hubs {
+    gap: 1px;
+    padding: 2px;
+  }
+  .dock-hub-btn {
+    padding: 5px 6px;
+    min-width: 32px;
+  }
+  .dock-hub-btn span.label {
+    display: none;
+  }
+  .dock-actions {
+    gap: 3px;
+  }
+  .dock-btn {
+    padding: 5px 7px;
+    font-size: 10px;
+    min-height: 32px;
+  }
+  .dock-strum-btn {
+    padding: 5px 8px;
+    font-size: 10px;
+    min-height: 32px;
+  }
 }
