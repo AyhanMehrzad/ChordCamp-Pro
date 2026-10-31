@@ -1,5 +1,5 @@
 // ChordCamp Pro - 100% Offline Service Worker (Cache-First Strategy)
-const CACHE_NAME = 'chordcamp-pro-v2';
+const CACHE_NAME = 'chordcamp-pro-v3';
 
 const OFFLINE_URLS = [
   './',
@@ -14,9 +14,10 @@ const OFFLINE_URLS = [
   './js/drills.js',
   './js/metronome.js',
   './js/app.js',
-  './assets/logo.svg',
   './assets/icon-192.png',
-  './assets/icon-512.png'
+  './assets/icon-512.png',
+  './assets/icon-maskable.png',
+  './assets/logo.png'
 ];
 
 // Install: pre-cache all assets

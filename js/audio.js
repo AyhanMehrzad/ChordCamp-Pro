@@ -203,3 +203,8 @@ function updateDroneUI() {
     text.textContent = 'Start Drone';
   }
 }
+
+// Zero-latency mobile audio unlock on first user gesture
+window.addEventListener('pointerdown', function initAudioOnce() {
+  try { getAudioContext(); } catch (e) {}
+}, { once: true, passive: true });

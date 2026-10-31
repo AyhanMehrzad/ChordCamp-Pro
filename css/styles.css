@@ -56,16 +56,20 @@ body {
 button, select, input {
   font: inherit;
   color: inherit;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 button {
   cursor: pointer;
   user-select: none;
-  transition: transform 0.12s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.09s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease;
 }
 
 button:active {
-  transform: scale(0.96);
+  transform: scale(0.95);
 }
 
 /* PC vs MOBILE APP CONTAINER (100% FLUID WIDTH - ZERO BLANK DEAD-ZONES) */
@@ -73,7 +77,7 @@ button:active {
   width: 100%;
   max-width: 100%;
   margin: 0;
-  padding: 18px 28px 120px;
+  padding: 18px 28px 130px;
   box-sizing: border-box;
 }
 
@@ -90,9 +94,19 @@ button:active {
 .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   font: 700 23px 'Space Grotesk', sans-serif;
   letter-spacing: -0.8px;
+}
+
+.brand-logo-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  vertical-align: middle;
+  object-fit: cover;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), 0 0 12px rgba(216, 255, 101, 0.35);
+  border: 1px solid rgba(216, 255, 101, 0.4);
 }
 
 .brand-icon {
@@ -1832,115 +1846,122 @@ button:active {
   .metro-main-btns {
     grid-template-columns: 1fr;
   }
-  .thumb-dock {
-    width: fit-content;
-    max-width: calc(100vw - 16px);
-    bottom: 12px;
-    padding: 5px 7px;
-    border-radius: 999px;
-    justify-content: center;
-    gap: 6px;
-  }
-  .dock-hubs {
-    background: rgba(8, 13, 9, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    padding: 2px;
-    gap: 2px;
-  }
-  .dock-hub-btn {
-    flex-direction: row;
-    padding: 5px 9px;
-    min-width: auto;
-    font-size: 11px;
-    gap: 4px;
-    border-radius: 999px;
-  }
-  .dock-hub-btn span.label {
-    display: inline;
-    font-size: 10.5px;
-  }
-  .dock-actions {
-    gap: 4px;
-  }
-  .dock-btn {
-    padding: 6px 10px;
-    font-size: 11px;
-    min-height: 35px;
-    border-radius: 999px;
-  }
-  .dock-strum-btn {
-    padding: 6px 13px;
-    font-size: 11.5px;
-    min-height: 35px;
-    border-radius: 999px;
-  }
-  .dock-btn span.hide-sm { display: inline; }
   .chord-sheet-modal {
     max-width: 100%;
     border-radius: 24px 24px 0 0;
   }
 }
 
-@media (max-width: 560px) {
+/* SMART MOBILE STUDIO DOCK (GENEROUS TOUCH TARGETS • NEVER TINY) */
+@media (max-width: 680px) {
+  body {
+    padding-bottom: 145px !important;
+  }
+  .shell {
+    padding-bottom: 145px !important;
+  }
   .thumb-dock {
-    gap: 4px;
-    padding: 4px 6px;
-    bottom: 8px;
+    width: calc(100vw - 18px);
+    max-width: 440px;
+    bottom: 10px;
+    padding: 8px 10px;
+    border-radius: 26px;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.9), 0 0 28px rgba(216, 255, 101, 0.15);
   }
-  .dock-hub-btn {
-    padding: 5px 7px;
-    font-size: 10px;
-    gap: 3px;
-  }
-  .dock-hub-btn span.label {
-    font-size: 9.5px;
-  }
-  .dock-btn {
-    padding: 5px 8px;
-    font-size: 10.5px;
-  }
-  .dock-btn span.hide-sm {
+  .dock-divider {
     display: none;
   }
+  .dock-actions {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+  }
   .dock-strum-btn {
-    padding: 5px 10px;
+    flex: 1.35;
+    min-height: 44px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 800;
+    justify-content: center;
+    border-radius: 999px;
+  }
+  .dock-btn {
+    flex: 1;
+    min-height: 44px;
+    padding: 8px 10px;
+    font-size: 12.5px;
+    font-weight: 700;
+    justify-content: center;
+    border-radius: 999px;
+  }
+  .dock-btn span.hide-sm {
+    display: inline !important;
+  }
+  .dock-hubs {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    background: rgba(5, 9, 6, 0.7);
+    padding: 4px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .dock-hub-btn {
+    flex: 1;
+    min-height: 44px;
+    padding: 6px 2px;
+    border-radius: 999px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
+  .dock-hub-btn span:first-child {
+    font-size: 16px;
+    line-height: 1;
+  }
+  .dock-hub-btn span.label {
+    display: block !important;
     font-size: 11px;
+    font-weight: 700;
+    line-height: 1.1;
   }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 380px) {
   .chord-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
   }
   .card-title { font-size: 19px; }
   .thumb-dock {
-    gap: 3px;
-    padding: 3px 5px;
-    bottom: 6px;
-  }
-  .dock-hubs {
-    gap: 1px;
-    padding: 2px;
-  }
-  .dock-hub-btn {
-    padding: 5px 6px;
-    min-width: 32px;
-  }
-  .dock-hub-btn span.label {
-    display: none;
-  }
-  .dock-actions {
-    gap: 3px;
-  }
-  .dock-btn {
-    padding: 5px 7px;
-    font-size: 10px;
-    min-height: 32px;
+    width: calc(100vw - 12px);
+    padding: 6px 8px;
+    gap: 6px;
   }
   .dock-strum-btn {
-    padding: 5px 8px;
+    min-height: 42px;
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+  .dock-btn {
+    min-height: 42px;
+    font-size: 11.5px;
+    padding: 7px 8px;
+  }
+  .dock-btn span.hide-sm {
+    display: none;
+  }
+  .dock-hub-btn {
+    min-height: 42px;
+  }
+  .dock-hub-btn span.label {
     font-size: 10px;
-    min-height: 32px;
   }
 }
