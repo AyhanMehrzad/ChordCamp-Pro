@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=ChordCamp Pro
+GenericName=Guitar Chord Playground
+Comment=Interactive offline guitar chords, scales, drills, and pro metronome
+Exec=bash -c "$(dirname %k)/chordcamp.sh"
+Path=./
+Icon=guitar
+Terminal=false
+Categories=AudioVideo;Audio;Music;Education;
+StartupNotify=true
+Keywords=guitar;chords;scales;tuner;metronome;metal;caged;

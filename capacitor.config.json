@@ -1,0 +1,14 @@
+{
+  "appId": "com.chordcamp.pro",
+  "appName": "ChordCamp Pro",
+  "webDir": ".",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "backgroundColor": "#0a0f0b",
+    "allowMixedContent": true,
+    "captureInput": true
+  }
+}

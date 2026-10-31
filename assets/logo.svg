@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#141f16" />
+      <stop offset="100%" stop-color="#070c08" />
+    </linearGradient>
+    <linearGradient id="limeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#eeff85" />
+      <stop offset="100%" stop-color="#b8f52b" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="16" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Dark Rounded App Icon Background -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" stroke="#223325" stroke-width="6" />
+
+  <!-- Guitar Pick Body -->
+  <path d="M 256 70 C 370 70 430 140 410 260 C 390 380 280 440 256 460 C 232 440 122 380 102 260 C 82 140 142 70 256 70 Z" 
+        fill="#131e15" stroke="#314936" stroke-width="12" />
+
+  <!-- Glowing Neon Music / Guitar Note in Center -->
+  <g filter="url(#glow)">
+    <!-- Eighth note with guitar headstock flair -->
+    <path d="M 285 170 L 335 155 C 345 152 355 160 355 170 L 355 275 C 342 266 325 262 306 264 C 275 268 250 292 250 318 C 250 345 275 365 306 365 C 337 365 362 342 362 315 L 362 195 L 285 215 L 285 305 C 272 296 255 292 236 294 C 205 298 180 322 180 348 C 180 375 205 395 236 395 C 267 395 292 372 292 345 L 292 185 C 292 176 288 172 285 170 Z" 
+          fill="url(#limeGrad)" />
+    <!-- Chord Strings Accents -->
+    <circle cx="210" cy="180" r="10" fill="#4de8ff" />
+    <circle cx="235" cy="155" r="10" fill="#ffd166" />
+    <circle cx="265" cy="140" r="10" fill="#ff758f" />
+  </g>
+</svg>

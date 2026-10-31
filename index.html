@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <title>ChordCamp Pro — Interactive Guitar Playground & Practice Studio</title>
+  <meta name="description" content="Offline interactive guitar playground, 90+ chords, scales, CAGED positions, capo transposition, and physical Karplus-Strong string synthesis.">
+  <meta name="theme-color" content="#0d140e">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="shell">
+  <!-- Top Navigation -->
+  <header class="nav">
+    <div class="brand">
+      <span class="brand-icon">♪</span>
+      ChordCamp<span style="color:var(--lime)">.pro</span>
+    </div>
+
+    <div class="nav-actions">
+      <!-- Instrument Audio Model Switcher -->
+      <div class="sound-toggle" title="Karplus-Strong physical modeling engine">
+        <button class="sound-btn active" id="btnSoundAcoustic" onclick="setGuitarSound('acoustic')">🎸 Warm Acoustic</button>
+        <button class="sound-btn" id="btnSoundElectric" onclick="setGuitarSound('electric')">⚡ Clean Electric</button>
+      </div>
+
+      <!-- Top Capo Quick Selector -->
+      <div class="capo-nav-pill" title="Set guitar capo fret">
+        <span>🔒 Capo:</span>
+        <select class="capo-select-nav" id="navCapoSelect" onchange="setGlobalCapo(+this.value)">
+          <option value="0">No Capo</option>
+          <option value="1">Capo 1 (+1)</option>
+          <option value="2">Capo 2 (+2)</option>
+          <option value="3">Capo 3 (+3)</option>
+          <option value="4">Capo 4 (+4)</option>
+          <option value="5">Capo 5 (+5)</option>
+          <option value="6">Capo 6 (+6)</option>
+          <option value="7">Capo 7 (+7)</option>
+        </select>
+      </div>
+
+      <button class="nav-pill" id="globalEasyBtn" onclick="toggleGlobalEasyMode()" title="Toggle easy 3-finger shapes for barre chords">
+        ✨ Easy Shapes: <b id="easyStateText">ON</b>
+      </button>
+
+      <span class="nav-pill">🔥 <b id="totalStrumCount">0</b> strums</span>
+    </div>
+  </header>
+
+  <!-- Navigation Hub Tabs -->
+  <nav class="hub-tabs" aria-label="Main Navigation">
+    <button class="hub-tab active" data-hub="chords" onclick="switchHub('chords')">
+      <span class="icon">🎸</span>
+      <span>Chord Playground</span>
+    </button>
+    <button class="hub-tab" data-hub="modes" onclick="switchHub('modes')">
+      <span class="icon">🧪</span>
+      <span>Scales & Modes</span>
+    </button>
+    <button class="hub-tab" data-hub="drills" onclick="switchHub('drills')">
+      <span class="icon">⏱️</span>
+      <span>Practice Drills</span>
+    </button>
+    <button class="hub-tab" data-hub="metronome" onclick="switchHub('metronome')">
+      <span class="icon">🥁</span>
+      <span>Pro Metronome</span>
+    </button>
+  </nav>
+
+  <!-- ========================================== -->
+  <!-- HUB 1: CHORDS & INTERACTIVE STAGE         -->
+  <!-- ========================================== -->
+  <main class="hub-view active" id="hub-chords">
+    <section class="inspector-stage" aria-label="Chord Inspector Stage">
+      <!-- DYNAMIC CAPO BANNER & DIAL -->
+      <div class="capo-stage-banner" id="capoStageBanner">
+        <div class="capo-banner-info">
+          <div class="capo-lock-icon">🔒</div>
+          <div>
+            <div style="font:700 13px 'Space Grotesk';color:var(--gold)" id="capoStatusTitle">
+              Standard Tuning (No Capo)
+            </div>
+            <div style="font-size:11px;color:#c9baa0" id="capoStatusSub">
+              Select a capo fret to transpose chords to new positions up the neck!
+            </div>
+          </div>
+        </div>
+
+        <div class="capo-quick-btns" id="capoQuickBtns">
+          <span style="font-size:10px;font-weight:700;color:var(--gold);margin-right:2px">CAPO FRET:</span>
+          <button class="capo-btn active" data-capo="0" onclick="setGlobalCapo(0)">0 (None)</button>
+          <button class="capo-btn" data-capo="1" onclick="setGlobalCapo(1)">1</button>
+          <button class="capo-btn" data-capo="2" onclick="setGlobalCapo(2)">2</button>
+          <button class="capo-btn" data-capo="3" onclick="setGlobalCapo(3)">3</button>
+          <button class="capo-btn" data-capo="4" onclick="setGlobalCapo(4)">4</button>
+          <button class="capo-btn" data-capo="5" onclick="setGlobalCapo(5)">5</button>
+          <button class="capo-btn" data-capo="6" onclick="setGlobalCapo(6)">6</button>
+          <button class="capo-btn" data-capo="7" onclick="setGlobalCapo(7)">7</button>
+        </div>
+      </div>
+
+      <!-- STAGE HEADER WITH SOUNDING CHORD & TAGS -->
+      <div class="inspector-header">
+        <div class="stage-title-wrap">
+          <div class="stage-badge" id="stageBadge">C</div>
+          <div class="stage-meta">
+            <h2>
+              <span id="stageName">C Major</span>
+              <div class="stage-badges">
+                <span class="tag standard" id="stageTag">Standard</span>
+                <span class="tag capo-tag" id="stageCapoTag" style="display:none">Capo Sound</span>
+                <button class="tag" style="background:rgba(216,255,101,0.12);border-color:rgba(216,255,101,0.3);color:var(--lime);cursor:pointer" onclick="openChordSheet(activeChordName)" title="Slide up enlarged view">🔍 Large View</button>
+              </div>
+            </h2>
+            <p id="stageSubtitle">Bright open chord • Tap individual strings to test each finger</p>
+          </div>
+        </div>
+
+        <div class="voicing-toggle" id="voicingToggleGroup">
+          <button class="v-btn active" id="btnEasyVoicing" onclick="setVoicingMode(true)">✨ Easy Voicing</button>
+          <button class="v-btn" id="btnStdVoicing" onclick="setVoicingMode(false)">🎸 Standard Shape</button>
+        </div>
+      </div>
+
+      <!-- MULTI-POSITION SELECTOR BAR -->
+      <div class="positions-bar-wrap">
+        <span class="positions-label">
+          <span>📐</span>
+          <span>Neck Positions:</span>
+        </span>
+        <div class="position-pills" id="stagePositionPills"></div>
+      </div>
+
+      <!-- DIAGRAM & INTERACTIVE CONTROLS -->
+      <div class="inspector-grid">
+        <div class="diagram-stage-card">
+          <div class="diagram-hint" onclick="openChordSheet(activeChordName)" style="cursor:pointer" title="Click to slide up large view">👆 Tap strings to test • 🔍 Tap to view large</div>
+          <div id="stageDiagramContainer" onclick="openChordSheet(activeChordName)" style="cursor:pointer" title="Click to slide up large view"></div>
+        </div>
+
+        <div class="stage-controls">
+          <div class="strum-actions">
+            <button class="btn-strum primary" onclick="playActiveChord('strum')">🔊 Strum Full Chord</button>
+            <button class="btn-strum secondary" onclick="playActiveChord('arpeggio')">🎶 Slow Arpeggio (String by String)</button>
+          </div>
+
+          <div>
+            <div style="font:700 12px 'Space Grotesk';text-transform:uppercase;color:var(--muted);letter-spacing:1px;margin-bottom:8px">
+              Step-by-step finger placement (Low to High strings)
+            </div>
+            <div class="finger-steps-grid" id="stageStepsGrid"></div>
+          </div>
+
+          <div class="coach-box" id="stageCoachBox">
+            <span style="font-size:18px">💡</span>
+            <div id="stageCoachText">Curve your fingers like you're holding a tennis ball so you don't accidentally mute neighboring open strings.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Two-Tier Uncluttered Chord Filters -->
+    <section class="filter-container">
+      <div class="root-bar-wrap">
+        <span class="filter-label">Root Note:</span>
+        <div class="root-pills" id="rootFilterPills"></div>
+      </div>
+
+      <div class="quality-bar-wrap">
+        <div class="quality-pills" id="qualityFilterPills"></div>
+        <div class="search-box">
+          <input type="search" id="chordSearchInput" class="search-input" placeholder="Search (e.g. m11, maj9, Cadd9, F#)..." oninput="renderChordGrid()">
+        </div>
+      </div>
+    </section>
+
+    <!-- Chord Cards Grid -->
+    <section class="chord-grid" id="chordGrid"></section>
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- HUB 2: SIMPLIFIED SCALES & MODES (PENTATONICS + MODES)   -->
+  <!-- ======================================================== -->
+  <main class="hub-view" id="hub-modes">
+    <!-- Top Friendly Category Switcher -->
+    <div class="scale-category-tabs">
+      <button class="scale-cat-btn active" data-cat="pentatonic" onclick="setScaleCategory('pentatonic')">
+        <span>🎸</span>
+        <span>Pentatonic & Blues (The Essentials)</span>
+      </button>
+      <button class="scale-cat-btn" data-cat="modes" onclick="setScaleCategory('modes')">
+        <span>🌟</span>
+        <span>The 7 Modes (Plain English Moods)</span>
+      </button>
+      <button class="scale-cat-btn" data-cat="technique" onclick="setScaleCategory('technique')">
+        <span>⚡</span>
+        <span>Shred & Speed (3NPS / Chromatic)</span>
+      </button>
+    </div>
+
+    <!-- Scale Cards Grid -->
+    <div class="scale-selector-cards" id="scaleCardsSelector"></div>
+
+    <!-- Active Scale & Mode Interactive Playground -->
+    <div class="scale-view-panel">
+      <!-- Ambient Drone Bar -->
+      <div class="drone-mini-bar">
+        <div style="font-size:12px;color:var(--text)">
+          <strong style="color:var(--lime)">🎵 Continuous Jamming Drone (<span id="droneRootDisplay">A</span> Root + 5th):</strong>
+          <span style="color:var(--muted)">Turn this on and solo with the scale notes below!</span>
+        </div>
+        <button class="drone-mini-btn" id="droneToggleBtn" onclick="toggleDrone()">
+          <span id="droneBtnIcon">▶</span>
+          <span id="droneBtnText">Start Drone</span>
+        </button>
+      </div>
+
+      <!-- Scale Header -->
+      <div class="scale-header">
+        <div class="scale-title-block">
+          <h3>
+            <span id="scaleTitleDisplay">A Minor Pentatonic</span>
+            <span class="scale-formula-tag" id="scaleFormulaTag">1 - ♭3 - 4 - 5 - ♭7</span>
+          </h3>
+          <p style="margin:4px 0 0;font-size:13px;color:var(--muted)" id="scaleSubDisplay">
+            The undisputed king of rock & blues solos. Almost impossible to hit a bad note!
+          </p>
+        </div>
+
+        <div class="scale-controls-row">
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Key:</span>
+            <select class="metro-select" id="scaleRootSelect" onchange="changeScaleRoot()" style="width:auto">
+              <option value="0">C Key</option>
+              <option value="2">D Key</option>
+              <option value="4">E Key</option>
+              <option value="5">F Key</option>
+              <option value="7">G Key</option>
+              <option value="9" selected>A Key</option>
+              <option value="11">B Key</option>
+            </select>
+          </div>
+
+          <button class="btn-card play" style="padding:10px 14px" onclick="playScaleNotesAscending()">
+            ▶ Play Notes
+          </button>
+        </div>
+      </div>
+
+      <!-- Interactive Clickable Scale Note Chips -->
+      <div style="margin-top:14px">
+        <div style="font:700 11px 'Space Grotesk';color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px">
+          Scale Notes (Tap any note to hear it):
+        </div>
+        <div class="scale-chips-row" id="scaleNotesChipsRow"></div>
+      </div>
+
+      <!-- Fretboard View Toggles -->
+      <div class="fretboard-view-toggles">
+        <div class="view-btn-group">
+          <button class="view-btn active" id="btnViewBox1" onclick="setScaleViewMode('box1')">🎯 Easy Box 1 (Soloing Zone)</button>
+          <button class="view-btn" id="btnViewAll" onclick="setScaleViewMode('all')">🌐 Full Fretboard</button>
+        </div>
+
+        <button class="nav-pill" style="cursor:pointer" onclick="toggleIntervalDisplay()">
+          🔤 Display: <b id="displayModeLabel">Note Names (A, C, D)</b>
+        </button>
+      </div>
+
+      <!-- Interactive Guitar Fretboard -->
+      <div class="fretboard-wrap">
+        <svg class="fretboard-svg" id="fretboardSvg" viewBox="0 0 780 230" role="img" aria-label="Interactive Guitar Fretboard"></svg>
+      </div>
+
+      <!-- Legend -->
+      <div class="fret-legend">
+        <div class="legend-item"><span class="legend-dot" style="background:#ffad83"></span> <strong>Root Note (Home base)</strong></div>
+        <div class="legend-item"><span class="legend-dot" style="background:#4de8ff"></span> <strong>Blue Note (♭5)</strong></div>
+        <div class="legend-item"><span class="legend-dot" style="background:#e58cff"></span> <strong>Modal Flavor Note</strong></div>
+        <div class="legend-item"><span class="legend-dot" style="background:#d8ff65"></span> <strong>Scale Notes</strong></div>
+        <div class="legend-item" style="margin-left:auto"><em>💡 Tap any circle on the neck to pluck it with acoustic audio!</em></div>
+      </div>
+
+      <!-- "How to Practice & Play" Plain English Roadmap -->
+      <div class="practice-coach-card">
+        <div class="practice-col">
+          <h4>💡 How to Practice & Play This Scale</h4>
+          <p id="coachMoodText">Play this over any rock, pop, or blues backing track. You can start on any note, but always resolve back to the orange Root note.</p>
+          <div style="font-size:12px;color:var(--muted)">
+            <strong>Suggested Backing Chords / Vamp:</strong> <span id="coachVampText" style="color:var(--lime)">Am – Dm – Em</span>
+          </div>
+        </div>
+
+        <div class="practice-col">
+          <h4>🎯 3-Step Practice Drill</h4>
+          <ol class="practice-steps-list" id="coachStepsList">
+            <li><strong>Step 1:</strong> Pick slowly up and down inside Box 1 with alternate picking.</li>
+            <li><strong>Step 2:</strong> Turn on the <strong>Ambient Drone</strong> above and improvise 2-note ideas.</li>
+            <li><strong>Step 3:</strong> Bend the G string or B string slightly for instant vocal expression.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ========================================== -->
+  <!-- HUB 3: PRACTICE DRILLS                    -->
+  <!-- ========================================== -->
+  <main class="hub-view" id="hub-drills">
+    <div class="drills-grid">
+      <!-- Drill 1: 1-Minute Chord Change Test -->
+      <div class="drill-card">
+        <div>
+          <div style="color:var(--lime);font:700 11px 'Space Grotesk';text-transform:uppercase;letter-spacing:1px">Drill 1 • JustinGuitar Method</div>
+          <h3 class="drill-title">1-Minute Chord Change</h3>
+          <p class="drill-desc">Pick two chords and switch back and forth as fast and cleanly as you can in 60 seconds.</p>
+        </div>
+
+        <div style="display:flex;gap:8px;margin:10px 0">
+          <select class="metro-select" id="drillChordA" onchange="resetChangeDrill()">
+            <option>G</option><option>C</option><option>D</option><option>Em</option><option>Am</option><option>F</option><option>Cadd9</option>
+          </select>
+          <span style="display:grid;place-items:center;font-weight:700">⇄</span>
+          <select class="metro-select" id="drillChordB" onchange="resetChangeDrill()">
+            <option>Cadd9</option><option>D</option><option>Em</option><option>C</option><option>G</option><option>Am</option><option>F</option>
+          </select>
+        </div>
+
+        <div class="drill-interactive">
+          <div class="big-stat" id="drillChangeCount">0</div>
+          <div class="stat-label">Clean Changes</div>
+          <div style="font:700 16px 'Space Grotesk';color:var(--muted);margin-top:8px" id="drillTimerDisplay">01:00</div>
+        </div>
+
+        <div style="display:flex;gap:6px">
+          <button class="btn-drill" id="btnStartDrill" onclick="toggleChangeDrill()">▶ Start 60s Test</button>
+          <button class="btn-drill" id="btnCountDrill" onclick="registerChange()" style="background:var(--panel2);color:var(--text);border:1px solid var(--line-bright);display:none">+1 (Tap/Space)</button>
+        </div>
+
+        <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px">
+          Personal Best: <strong id="bestChanges" style="color:var(--lime)">0</strong> changes
+        </div>
+      </div>
+
+      <!-- Drill 2: Fretboard Blind Note Hunter -->
+      <div class="drill-card">
+        <div>
+          <div style="color:var(--cyan);font:700 11px 'Space Grotesk';text-transform:uppercase;letter-spacing:1px">Drill 2 • Fretboard Mastery</div>
+          <h3 class="drill-title">Fretboard Note Hunter</h3>
+          <p class="drill-desc">Escape the box trap! Find and tap every target note across all 6 strings before the clock runs out.</p>
+        </div>
+
+        <div class="drill-interactive">
+          <div class="stat-label">Target Note to Find:</div>
+          <div class="big-stat" style="color:var(--cyan)" id="hunterTargetNote">A</div>
+          <div style="font:700 15px 'Space Grotesk';color:var(--muted);margin-top:6px">
+            Score: <span id="hunterScore" style="color:var(--lime)">0</span> • Time: <span id="hunterTime">30s</span>
+          </div>
+        </div>
+
+        <button class="btn-drill" style="background:var(--cyan);color:#0a1518" id="hunterStartBtn" onclick="startNoteHunter()">
+          🎯 Start Hunting Challenge
+        </button>
+
+        <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px">
+          Best Score: <strong id="bestHunter" style="color:var(--cyan)">0</strong> pts
+        </div>
+      </div>
+
+      <!-- Drill 3: Modal Ear Trainer Quiz -->
+      <div class="drill-card">
+        <div>
+          <div style="color:var(--violet);font:700 11px 'Space Grotesk';text-transform:uppercase;letter-spacing:1px">Drill 3 • Ear Training</div>
+          <h3 class="drill-title">Modal Mood Quiz</h3>
+          <p class="drill-desc">Listen to the synthesized modal cadence and identify which mode is speaking to you.</p>
+        </div>
+
+        <div class="drill-interactive">
+          <button class="btn-strum primary" onclick="playQuizAudio()" style="margin:0 auto 10px">
+            🔊 Play Mystery Mode
+          </button>
+          <div id="quizResultText" style="font-size:12px;color:var(--muted)">Hit play, listen to the color note, then guess below!</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px" id="quizOptions">
+          <button class="btn-card stage" onclick="checkQuizAnswer('Ionian')">Ionian (Major)</button>
+          <button class="btn-card stage" onclick="checkQuizAnswer('Dorian')">Dorian (♮6)</button>
+          <button class="btn-card stage" onclick="checkQuizAnswer('Phrygian')">Phrygian (♭2)</button>
+          <button class="btn-card stage" onclick="checkQuizAnswer('Lydian')">Lydian (♯4)</button>
+          <button class="btn-card stage" onclick="checkQuizAnswer('Mixolydian')">Mixolydian (♭7)</button>
+          <button class="btn-card stage" onclick="checkQuizAnswer('Aeolian')">Aeolian (♭6)</button>
+        </div>
+
+        <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px">
+          Streak: <strong id="quizStreak" style="color:var(--violet)">0</strong> correct in a row
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ========================================== -->
+  <!-- HUB 4: PRO METRONOME STUDIO               -->
+  <!-- ========================================== -->
+  <main class="hub-view" id="hub-metronome">
+    <div class="metronome-stage">
+      <div class="metro-top">
+        <div>
+          <span style="font:700 11px 'Space Grotesk';color:var(--lime);text-transform:uppercase;letter-spacing:1px">Studio Rhythm Engine</span>
+          <h2 style="font:700 28px 'Space Grotesk';margin:2px 0 0">Visual Groove Metronome</h2>
+        </div>
+
+        <div class="metro-display">
+          <span class="metro-bpm" id="metroBpmVal">80</span>
+          <span class="metro-bpm-unit">BPM</span>
+        </div>
+      </div>
+
+      <!-- Beat Bulbs Indicator -->
+      <div class="metro-beat-lights" id="metroLights">
+        <div class="beat-bulb accent"></div>
+        <div class="beat-bulb"></div>
+        <div class="beat-bulb"></div>
+        <div class="beat-bulb"></div>
+      </div>
+
+      <!-- Tempo Slider -->
+      <input type="range" class="metro-slider" id="metroSlider" min="40" max="240" value="80" oninput="updateBpm(this.value)">
+
+      <!-- Fine Adjustment Buttons -->
+      <div class="metro-fine-controls">
+        <button class="fine-btn" onclick="adjustBpm(-5)">-5</button>
+        <button class="fine-btn" onclick="adjustBpm(-1)">-1</button>
+        <button class="fine-btn" onclick="setBpmPreset(60)">60</button>
+        <button class="fine-btn" onclick="setBpmPreset(80)">80</button>
+        <button class="fine-btn" onclick="setBpmPreset(105)">105</button>
+        <button class="fine-btn" onclick="setBpmPreset(120)">120</button>
+        <button class="fine-btn" onclick="adjustBpm(+1)">+1</button>
+        <button class="fine-btn" onclick="adjustBpm(+5)">+5</button>
+      </div>
+
+      <!-- Rhythm Options Grid -->
+      <div class="metro-options-grid">
+        <div class="metro-option-card">
+          <label for="metroTimeSig">Time Signature</label>
+          <select class="metro-select" id="metroTimeSig" onchange="updateTimeSig()">
+            <option value="4">4/4 (Standard)</option>
+            <option value="3">3/4 (Waltz)</option>
+            <option value="2">2/4 (March)</option>
+            <option value="6">6/8 (Slow Blues)</option>
+            <option value="5">5/4 (Dave Brubeck)</option>
+            <option value="7">7/8 (Prog Rock)</option>
+          </select>
+        </div>
+
+        <div class="metro-option-card">
+          <label for="metroSubdiv">Subdivision & Feel</label>
+          <select class="metro-select" id="metroSubdiv" onchange="updateSubdiv()">
+            <option value="1">Quarter Notes (1 2 3 4)</option>
+            <option value="2">8th Notes (1 & 2 &)</option>
+            <option value="4">16th Notes (1 e & a)</option>
+            <option value="3">Triplets (1 trip let)</option>
+            <option value="swing">Swing / Shuffle Feel</option>
+          </select>
+        </div>
+
+        <div class="metro-option-card">
+          <label for="metroSoundSelect">Sound Palette</label>
+          <select class="metro-select" id="metroSoundSelect">
+            <option value="woodblock" selected>Warm Woodblock / Clave</option>
+            <option value="rimshot">Drumstick Rimshot</option>
+            <option value="mechanical">Mechanical Vintage Click</option>
+            <option value="beep">Studio Digital Beep</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Speed Ladder (Tempo Ramp Trainer) -->
+      <div class="ladder-box">
+        <div>
+          <strong style="color:var(--orange);font-size:14px">⚡ Speed Ladder Trainer</strong>
+          <div style="font-size:12px;color:var(--muted)">Auto-increase tempo by +3 BPM every 4 bars to systematically build hand speed!</div>
+        </div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700">
+          <input type="checkbox" id="ladderToggle" style="accent-color:var(--orange)">
+          Enable Ladder
+        </label>
+      </div>
+
+      <!-- Main Start / Stop & Tap Tempo Buttons -->
+      <div class="metro-main-btns">
+        <button class="metro-play-btn" id="btnMetroToggle" onclick="toggleMetronome()">
+          <span id="metroIcon">▶</span>
+          <span id="metroBtnLabel">Start Metronome</span>
+        </button>
+        <button class="tap-tempo-btn" onclick="handleTapTempo()">
+          🥁 Tap Tempo
+        </button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ========================================== -->
+<!-- FLOATING THUMB DOCK (REACHABLE EVERYWHERE) -->
+<!-- ========================================== -->
+<nav class="thumb-dock" aria-label="Reachable Thumb Dock">
+  <div class="dock-hubs">
+    <button class="dock-hub-btn active" data-dock="chords" onclick="switchHub('chords')">
+      <span>🎸</span>
+      <span class="label">Chords</span>
+    </button>
+    <button class="dock-hub-btn" data-dock="modes" onclick="switchHub('modes')">
+      <span>🧪</span>
+      <span class="label">Scales</span>
+    </button>
+    <button class="dock-hub-btn" data-dock="drills" onclick="switchHub('drills')">
+      <span>⏱️</span>
+      <span class="label">Drills</span>
+    </button>
+    <button class="dock-hub-btn" data-dock="metronome" onclick="switchHub('metronome')">
+      <span>🥁</span>
+      <span class="label">Beat</span>
+    </button>
+  </div>
+
+  <div class="dock-divider"></div>
+
+  <div class="dock-actions">
+    <!-- Quick Metronome Toggle -->
+    <button class="dock-btn" id="dockMetroBtn" onclick="toggleMetronome()" title="Toggle Metronome">
+      <span>🥁</span>
+      <span id="dockBpmText">80</span>
+      <span class="hide-sm">BPM</span>
+    </button>
+
+    <!-- Quick Modal Drone Toggle -->
+    <button class="dock-btn" id="dockDroneBtn" onclick="toggleDrone()" title="Toggle Ambient Modal Drone">
+      <span>🎵</span>
+      <span class="hide-sm">Drone</span>
+    </button>
+
+    <!-- Instant Chord Play Strum -->
+    <button class="dock-strum-btn" id="dockStrumBtn" onclick="playActiveChord('strum')">
+      <span>🔊</span>
+      <span id="dockChordName">Play C</span>
+    </button>
+  </div>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<!-- ======================================================== -->
+<!-- SLIDE-UP LARGE CHORD SHEET (TAP A CHORD TO ENLARGE)      -->
+<!-- ======================================================== -->
+<div class="chord-sheet-backdrop" id="chordSheetBackdrop" onclick="closeChordSheet()"></div>
+
+<div class="chord-sheet-modal" id="chordSheetModal" role="dialog" aria-modal="true" aria-label="Enlarged Chord View">
+  <!-- Pull down handle / drag bar -->
+  <div class="sheet-drag-handle" onclick="closeChordSheet()" title="Tap or swipe down to close"></div>
+
+  <div class="sheet-header">
+    <div class="sheet-title-wrap">
+      <div class="sheet-badge" id="sheetBadge">Am</div>
+      <div class="sheet-meta">
+        <h2>
+          <span id="sheetChordName">Am</span>
+          <span class="tag standard" id="sheetTag">Standard</span>
+          <span class="tag capo-tag" id="sheetCapoTag" style="display:none">Capo Sound</span>
+        </h2>
+        <p id="sheetSubtitle">Bright open chord • Tap individual strings to test each finger</p>
+      </div>
+    </div>
+    <button class="sheet-close-btn" onclick="closeChordSheet()" aria-label="Close enlarged view">✕</button>
+  </div>
+
+  <!-- Voicing toggle inside sheet -->
+  <div class="sheet-voicing-wrap">
+    <div class="voicing-toggle" id="sheetVoicingToggleGroup">
+      <button class="v-btn active" id="sheetBtnEasyVoicing" onclick="setVoicingMode(true)">✨ Easy Voicing</button>
+      <button class="v-btn" id="sheetBtnStdVoicing" onclick="setVoicingMode(false)">🎸 Standard Shape</button>
+    </div>
+  </div>
+
+  <!-- Position pills inside sheet -->
+  <div class="sheet-positions-wrap" id="sheetPositionsWrap">
+    <span class="positions-label">
+      <span>📐</span>
+      <span>Positions:</span>
+    </span>
+    <div class="position-pills" id="sheetPositionPills"></div>
+  </div>
+
+  <!-- Big Enlarged Diagram Stage -->
+  <div class="sheet-diagram-card">
+    <div class="sheet-diagram-hint">👆 Tap any string or dot on this large diagram to pluck each note!</div>
+    <div id="sheetDiagramContainer" class="sheet-diagram-container"></div>
+  </div>
+
+  <!-- Big Strum & Arpeggio Buttons -->
+  <div class="sheet-strum-actions">
+    <button class="btn-strum primary sheet-strum-btn" onclick="playActiveChord('strum')">
+      🔊 Strum Full Chord
+    </button>
+    <button class="btn-strum secondary sheet-strum-btn" onclick="playActiveChord('arpeggio')">
+      🎶 Slow Arpeggio (String by String)
+    </button>
+  </div>
+
+  <!-- Step-by-Step Finger Guide inside sheet -->
+  <div class="sheet-finger-guide">
+    <div class="sheet-section-title">🖐️ Finger Placement:</div>
+    <div class="finger-steps-grid" id="sheetStepsGrid"></div>
+  </div>
+
+  <!-- Tip Box inside sheet -->
+  <div class="sheet-tip-box" id="sheetTipBox">
+    <strong>💡 Pro Tip:</strong> <span id="sheetTipText"></span>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- JAVASCRIPT LOGIC & KARPLUS-STRONG SYNTH    -->
+<!-- ========================================== -->
+
+  <!-- Modular Scripts -->
+  <script src="js/chords-data.js"></script>
+  <script src="js/scales-data.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/chords.js"></script>
+  <script src="js/fretboard.js"></script>
+  <script src="js/drills.js"></script>
+  <script src="js/metronome.js"></script>
+  <script src="js/app.js"></script>
+
+  <!-- PWA Offline Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(() => console.log('ChordCamp Pro offline Service Worker registered.'))
+          .catch(err => console.warn('Service Worker registration skipped:', err));
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+{
+  "name": "chordcamp-pro",
+  "version": "1.0.0",
+  "description": "Offline interactive guitar playground, 90+ chords, metal power chords, CAGED positions, scales, and pro metronome.",
+  "main": "index.html",
+  "scripts": {
+    "start": "start ChordCamp.exe",
+    "launch": "launch-windows.bat",
+    "cap:add": "npx cap add android",
+    "cap:sync": "npx cap sync android",
+    "cap:open": "npx cap open android",
+    "build:apk": "npx cap sync android && cd android && gradlew.bat assembleRelease"
+  },
+  "keywords": [
+    "guitar",
+    "chords",
+    "power-chords",
+    "metal",
+    "scales",
+    "caged",
+    "metronome",
+    "offline"
+  ],
+  "author": "ChordCamp Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/android": "^6.0.0"
+  }
+}
