@@ -1377,57 +1377,80 @@ button:active {
   gap: 10px;
 }
 
-/* FLOATING BOTTOM REACHABLE DOCK */
+/* ========================================================
+   FLOATING STUDIO DOCK (BALANCED CAPSULE - ZERO EMPTY VOIDS)
+   ======================================================== */
 .thumb-dock {
   position: fixed;
-  bottom: 12px;
+  bottom: 18px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 100;
-  width: min(96vw, 820px);
-  background: rgba(16, 23, 17, 0.94);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(216, 255, 101, 0.25);
-  border-radius: 24px;
-  padding: 7px 10px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75);
+  width: fit-content;
+  max-width: calc(100vw - 24px);
+  background: rgba(13, 20, 15, 0.94);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(216, 255, 101, 0.32);
+  border-radius: 999px;
+  padding: 6px 10px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.85), 0 0 25px rgba(216, 255, 101, 0.12);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 6px;
+  justify-content: center;
+  gap: 10px;
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.thumb-dock:hover {
+  border-color: rgba(216, 255, 101, 0.5);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 32px rgba(216, 255, 101, 0.18);
 }
 
 .dock-hubs {
   display: flex;
+  align-items: center;
   gap: 4px;
+  background: rgba(8, 13, 9, 0.7);
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .dock-hub-btn {
   background: transparent;
   border: 1px solid transparent;
   color: var(--muted);
-  padding: 7px 11px;
-  border-radius: 15px;
-  font-size: 11px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 11.5px;
   font-weight: 700;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 2px;
-  min-width: 54px;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  white-space: nowrap;
+}
+
+.dock-hub-btn:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .dock-hub-btn.active {
-  background: var(--lime-dim);
-  color: var(--lime);
-  border-color: rgba(216, 255, 101, 0.3);
+  background: var(--lime);
+  color: #0d180b !important;
+  font-weight: 800;
+  box-shadow: 0 2px 10px rgba(216, 255, 101, 0.35);
 }
 
 .dock-divider {
   width: 1px;
-  height: 32px;
-  background: var(--line);
+  height: 28px;
+  background: rgba(216, 255, 101, 0.2);
+  margin: 0 2px;
 }
 
 .dock-actions {
@@ -1437,38 +1460,60 @@ button:active {
 }
 
 .dock-btn {
-  background: var(--panel2);
+  background: rgba(22, 32, 23, 0.85);
   border: 1px solid var(--line-bright);
   color: var(--text);
-  padding: 9px 13px;
-  border-radius: 15px;
+  padding: 8px 14px;
+  border-radius: 999px;
   font-size: 12px;
   font-weight: 700;
   display: flex;
   align-items: center;
   gap: 6px;
-  min-height: 42px;
+  min-height: 38px;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  white-space: nowrap;
+}
+
+.dock-btn:hover {
+  border-color: var(--lime);
+  background: rgba(30, 44, 32, 0.95);
+  transform: translateY(-1px);
 }
 
 .dock-btn.active {
   background: var(--lime);
-  color: #111a0d;
+  color: #0e190b !important;
   border-color: var(--lime);
+  box-shadow: 0 3px 12px rgba(216, 255, 101, 0.35);
 }
 
 .dock-strum-btn {
-  background: var(--lime);
-  color: #111a0d;
+  background: linear-gradient(135deg, #d8ff65 0%, #b4f028 100%);
+  color: #0b1509;
   border: 0;
-  padding: 9px 15px;
-  border-radius: 15px;
-  font-weight: 700;
-  font-size: 12px;
-  min-height: 42px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 12.5px;
+  min-height: 38px;
   display: flex;
   align-items: center;
-  gap: 6px;
-  box-shadow: 0 4px 16px rgba(216, 255, 101, 0.28);
+  gap: 7px;
+  box-shadow: 0 4px 18px rgba(216, 255, 101, 0.45);
+  cursor: pointer;
+  transition: all 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
+  white-space: nowrap;
+}
+
+.dock-strum-btn:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 6px 22px rgba(216, 255, 101, 0.6);
+}
+
+.dock-strum-btn:active {
+  transform: scale(0.96);
 }
 
 .toast {
@@ -1781,28 +1826,45 @@ button:active {
   }
   .thumb-dock {
     width: calc(100vw - 16px);
+    max-width: 100%;
     bottom: 8px;
     padding: 6px 8px;
     border-radius: 20px;
+    justify-content: space-between;
+    gap: 4px;
+  }
+  .dock-hubs {
+    background: transparent;
+    border: none;
+    padding: 0;
+    gap: 2px;
   }
   .dock-hub-btn {
-    padding: 6px 8px;
-    min-width: 44px;
+    flex-direction: column;
+    padding: 5px 6px;
+    min-width: 42px;
     font-size: 10px;
+    gap: 2px;
+    border-radius: 12px;
   }
   .dock-hub-btn span.label {
     display: block;
     font-size: 9px;
   }
+  .dock-actions {
+    gap: 4px;
+  }
   .dock-btn {
-    padding: 8px 10px;
+    padding: 7px 10px;
     font-size: 11px;
     min-height: 38px;
+    border-radius: 14px;
   }
   .dock-strum-btn {
-    padding: 8px 12px;
+    padding: 7px 12px;
     font-size: 11px;
     min-height: 38px;
+    border-radius: 14px;
   }
   .dock-btn span.hide-sm { display: none; }
   .chord-sheet-modal {

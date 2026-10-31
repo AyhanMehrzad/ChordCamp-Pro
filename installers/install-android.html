@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Install ChordCamp Pro on Android</title>
+  <meta name="theme-color" content="#0a0f0b">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0a0f0b;
+      color: #e5edd6;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      text-align: center;
+    }
+    .card {
+      background: #111a13;
+      border: 1px solid rgba(216, 255, 101, 0.25);
+      border-radius: 28px;
+      padding: 32px 24px;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(216, 255, 101, 0.08);
+    }
+    .icon-wrap {
+      width: 88px;
+      height: 88px;
+      margin: 0 auto 20px;
+      border-radius: 24px;
+      background: #162419;
+      border: 2px solid rgba(216, 255, 101, 0.35);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 8px 24px rgba(216, 255, 101, 0.25);
+    }
+    .icon-wrap img {
+      width: 60px;
+      height: 60px;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    p.sub {
+      color: #92a48f;
+      font-size: 13.5px;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+    .btn-install {
+      background: #d8ff65;
+      color: #0c1809;
+      border: 0;
+      width: 100%;
+      padding: 16px;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 6px 20px rgba(216, 255, 101, 0.35);
+      transition: transform 0.15s ease, filter 0.15s ease;
+    }
+    .btn-install:active { transform: scale(0.97); }
+    .btn-open {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #b2c4ad;
+      width: 100%;
+      padding: 14px;
+      border-radius: 16px;
+      font-size: 14px;
+      font-weight: 700;
+      margin-top: 12px;
+      cursor: pointer;
+      text-decoration: none;
+      display: block;
+    }
+    .steps {
+      text-align: left;
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+      font-size: 13px;
+      color: #c5d4be;
+      line-height: 1.4;
+    }
+    .step-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(216, 255, 101, 0.15);
+      color: #d8ff65;
+      font-weight: 800;
+      font-size: 12px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(77, 232, 255, 0.12);
+      color: #4de8ff;
+      border: 1px solid rgba(77, 232, 255, 0.3);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="icon-wrap">
+      <img src="assets/logo.svg" alt="ChordCamp Icon">
+    </div>
+    <span class="badge">100% Offline • Standalone App</span>
+    <h1>ChordCamp Pro</h1>
+    <p class="sub">Install ChordCamp directly onto your Android device. Works full-screen with zero internet required.</p>
+
+    <button class="btn-install" id="installBtn" onclick="triggerInstall()">
+      <span>📲</span>
+      <span id="installBtnText">Install App on Phone</span>
+    </button>
+
+    <a href="index.html" class="btn-open">▶ Launch Web Version Offline</a>
+
+    <div class="steps">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div>Tap <b>"Install App on Phone"</b> above, or tap Chrome's menu (<b>⋮</b>) at the top right.</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div>Select <b>"Install app"</b> or <b>"Add to Home screen"</b>.</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div>ChordCamp Pro will appear in your app drawer and home screen just like an APK, working completely offline!</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let deferredPrompt = null;
+    const installBtn = document.getElementById('installBtn');
+    const installBtnText = document.getElementById('installBtnText');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = 'flex';
+      installBtnText.textContent = 'Install App on Phone';
+    });
+
+    function triggerInstall() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted ChordCamp installation.');
+            installBtnText.textContent = 'Installed!';
+          }
+          deferredPrompt = null;
+        });
+      } else {
+        alert('To install: Tap the three dots (⋮) menu at the top-right of Chrome and choose "Install app" or "Add to Home screen".');
+      }
+    }
+
+    window.addEventListener('appinstalled', () => {
+      installBtnText.textContent = '🎉 Installed Successfully!';
+      setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+    });
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>

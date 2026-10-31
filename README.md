@@ -1,101 +1,118 @@
 # 🎸 ChordCamp Pro — Interactive Guitar Playground & Offline Studio
 
-> **100% Offline • Zero Dependencies • Windows .exe • Linux Launcher • Android .apk & PWA**
+> **100% Offline • Zero Dependencies • Windows .exe & Installer • Linux One-Click Setup • Android 1-Tap & APK**
 
 ChordCamp Pro is a high-performance, offline guitar practice workstation and chord playground featuring real-time **Karplus-Strong physical modeling audio synthesis**, 90+ chords (including 17 heavy metal power chords), CAGED fretboard voicings, dynamic capo transposition, full scales and modes with soloing zones, interactive practice drills, and a precision metronome.
 
 ---
 
-## ⚡ Quick Start: How to Run
+## ⚡ Quick Start: Remade Installation Files
 
-### 🪟 Windows (.exe)
-1. **Option 1 (Native Executable - Recommended)**:
+### 🪟 Windows (.exe & Installer)
+1. **Automated Setup (Recommended)**:
+   - Double-click **[`Install-Windows.bat`](Install-Windows.bat)**.
+   - Automatically generates a **Desktop Shortcut** with the custom guitar pick icon and adds a Start Menu entry under `ChordCamp Pro`.
+2. **Direct Executable**:
    - Double-click **[`ChordCamp.exe`](ChordCamp.exe)**.
-   - Launches in a dedicated borderless desktop app window with no browser URL bar or clutter.
-2. **Option 2 (Batch Launcher)**:
+   - Runs instantly in a dedicated borderless desktop app window with no browser URL bar or command prompt flash.
+3. **Quick Batch Launcher**:
    - Double-click **[`launch-windows.bat`](launch-windows.bat)**.
-3. **Option 3 (Direct File)**:
-   - Double-click **[`index.html`](index.html)** in any web browser.
+4. **Uninstall**:
+   - Run **[`Uninstall-Windows.bat`](Uninstall-Windows.bat)** anytime to remove desktop and start menu shortcuts cleanly.
 
 ---
 
-### 🐧 Linux (.sh & .desktop)
-1. **Option 1 (One-Click Bash Launcher)**:
-   - Open terminal in this folder and run:
+### 🐧 Linux (One-Click Setup & Desktop Integration)
+1. **Automated Installer (Recommended)**:
+   - Open a terminal in this directory and run:
+     ```bash
+     chmod +x install-linux.sh
+     ./install-linux.sh
+     ```
+   - Automatically installs high-res guitar icons, creates an application launcher in `~/.local/share/applications/chordcamp-pro.desktop` (so ChordCamp Pro shows up in your GNOME/KDE/XFCE application menu), and links the `chordcamp` command to your terminal!
+2. **Instant Shell Launcher**:
+   - Simply run:
      ```bash
      chmod +x chordcamp.sh
      ./chordcamp.sh
      ```
-   - Automatically detects Chromium, Google Chrome, Brave, Edge, or Firefox and launches in dedicated desktop app window mode.
-2. **Option 2 (Desktop App Menu)**:
-   - Copy the desktop shortcut to your local applications directory:
-     ```bash
-     cp chordcamp.desktop ~/.local/share/applications/
-     ```
-   - ChordCamp Pro will now appear directly in your Ubuntu / Debian / Fedora / Arch / Mint application launcher!
+   - Automatically detects Google Chrome, Chromium, Brave, Edge, or Firefox and launches in dedicated app window mode.
+3. **Uninstall**:
+   - Run `./uninstall-linux.sh` to remove the application launcher and icons cleanly.
 
 ---
 
-### 📱 Android (.apk & 1-Tap Offline App)
-You have two easy ways to use ChordCamp Pro on your Android phone or tablet:
+### 📱 Android (1-Tap Offline App & APK)
 
-#### 1. Instant 1-Tap Offline Install (PWA — Recommended)
-1. Transfer this folder to your phone or host it on your local Wi-Fi / GitHub Pages.
-2. Open `index.html` in **Google Chrome** on your Android device.
-3. Tap the **Three Dots (⋮)** menu at top-right and select **"Install app"** or **"Add to Home screen"**.
-4. ChordCamp Pro will install directly onto your home screen with the custom guitar app icon. It runs **full-screen without browser bars** and works **100% offline** (powered by the built-in `sw.js` cache).
+#### 1. Instant 1-Tap Offline Install (Recommended)
+1. Transfer this folder to your Android device or open it in Chrome on your phone.
+2. Open **[`install-android.html`](install-android.html)** (or `index.html`).
+3. Tap the bright green **"Install App on Phone"** button (or tap Chrome's menu **⋮** ➔ **"Install app"** / **"Add to Home screen"**).
+4. ChordCamp Pro installs directly into your Android app drawer with the guitar pick icon, launches full-screen without address bars, and functions **100% offline** via the built-in Service Worker cache.
 
-#### 2. Building / Downloading the `.apk`
-- **Automatic GitHub Build**:
-  - When you push this repository to GitHub, the included **GitHub Actions CI/CD Workflow** (`.github/workflows/build-apk.yml`) automatically compiles the Android `.apk` on GitHub's cloud runners and attaches `chordcamp-debug.apk` to your GitHub Releases and Actions Artifacts for instant download!
-- **Local APK Compilation (via Capacitor & Android Studio)**:
+#### 2. Android `.apk` Compilation (GitHub Actions CI/CD)
+- **Automatic Cloud Build**:
+  - Push this repository to your GitHub account.
+  - The pre-configured **GitHub Actions Workflow** ([`.github/workflows/build-apk.yml`](.github/workflows/build-apk.yml)) automatically compiles `chordcamp-debug.apk` and `chordcamp-release.apk` on GitHub's Ubuntu runners and attaches them to your GitHub Releases and Actions Artifacts for instant download!
+- **Local Gradle Build (Capacitor)**:
   ```bash
-  # 1. Install dependencies
   npm install
-
-  # 2. Add Android platform & sync web assets
   npx cap add android
   npx cap sync android
-
-  # 3. Open in Android Studio or build via Gradle
-  cd android
-  ./gradlew assembleDebug
+  cd android && ./gradlew assembleDebug
   ```
-  The compiled APK will be located at:
-  `android/app/build/outputs/apk/debug/app-debug.apk`
 
 ---
 
-## 🔒 100% Offline Capability: How It Works
+## 🔒 100% Offline Architecture: How It Works
 
-- **Zero Cloud Reliance**: There are no external CDNs, fonts, or tracking scripts. Everything is completely self-contained in local files.
-- **Physical Modeling Audio Engine**: Sound is synthesized live in client memory using Web Audio API and the **Karplus-Strong string algorithm**, eliminating the need for bulky external audio files or downloads.
+- **Zero Cloud Reliance**: There are no external CDNs, Google Fonts, or tracking scripts. Everything is completely self-contained in local files.
+- **Physical Modeling Audio Engine**: String plucks and resonant guitar tones are synthesized live in client memory using Web Audio API and the **Karplus-Strong algorithm**, eliminating the need for bulky external sample files or downloads.
 - **Offline Cache**: Includes a native Service Worker (`sw.js`) that caches all code, styles, and assets on first run for airplane mode practice.
 
 ---
 
-## 📁 Clean Separated Architecture
+## 🎛️ Redesigned Floating Studio Dock
 
-The codebase has been completely separated into clean, modular files for easy maintenance:
+The bottom floating dock has been completely redesigned into a **balanced capsule dock**:
+- **Zero Empty Gap on PC**: Replaced the previous stretched container with an auto-fitting, centered studio capsule with glassmorphism and glowing neon lime accents.
+- **Grouped Controls**: Left-side navigation hubs (`🎸 Chords`, `🧪 Scales`, `⏱️ Drills`, `🥁 Beat`), sleek glowing separator, and right-side studio action buttons (`🥁 80 BPM`, `🎵 Drone`, `🔊 Play [Active Chord]`).
+- **Responsive Mobile Layout**: Automatically transitions to a thumb-reachable edge-to-edge bar on mobile screens.
+
+---
+
+## 📁 Repository Structure
 
 ```text
 ChordCamp-Pro/
 ├── index.html                   # Clean semantic HTML layout
-├── ChordCamp.exe                # Native Windows GUI offline executable
+├── ChordCamp.exe                # Native Windows GUI offline executable (with embedded icon)
+├── Install-Windows.bat          # Automated Windows desktop & start menu installer
+├── Uninstall-Windows.bat        # Windows shortcut cleaner
 ├── launch-windows.bat           # Windows quick batch launcher
 ├── chordcamp.sh                 # Linux shell launcher (dedicated app mode)
+├── install-linux.sh             # Automated Linux installer (desktop menu & terminal command)
+├── uninstall-linux.sh           # Linux uninstaller
 ├── chordcamp.desktop            # Linux FreeDesktop shortcut
+├── install-android.html         # Android 1-tap mobile installer & PWA onboarding page
 ├── manifest.json                # Web App Manifest for mobile installation
 ├── sw.js                        # Offline caching Service Worker
 ├── package.json                 # Project scripts and Capacitor setup
 ├── capacitor.config.json        # Android mobile configuration
-├── .gitignore                   # Git ignore patterns
+├── .gitignore                   # Clean Git ignore rules
+│
+├── installers/                  # Platform installer scripts grouped together
+│   ├── Install-Windows.bat
+│   ├── Uninstall-Windows.bat
+│   ├── install-linux.sh
+│   ├── uninstall-linux.sh
+│   └── install-android.html
 │
 ├── css/
 │   └── styles.css               # 100% fluid responsive styling (PC & Mobile)
 │
 ├── js/
-│   ├── chords-data.js           # 90+ chords database, power chords, caged shapes
+│   ├── chords-data.js           # 90+ chords database, metal power chords, caged shapes
 │   ├── scales-data.js           # Complete scales & modes, soloing box 1
 │   ├── audio.js                 # Karplus-Strong physical modeling guitar synth
 │   ├── chords.js                # Chord playground, dynamic SVG diagrams, sheet modal
@@ -106,6 +123,7 @@ ChordCamp-Pro/
 │
 ├── assets/
 │   ├── logo.svg                 # High-resolution vector logo
+│   ├── ChordCamp.ico            # Windows application icon
 │   ├── icon-192.png             # Android standard launcher icon
 │   └── icon-512.png             # High-res splash & store icon
 │
@@ -116,43 +134,10 @@ ChordCamp-Pro/
 
 ---
 
-## 🎸 Core Features
-
-1. **Chord Playground (90 Chords)**:
-   - **Metal Power Chords**: `E5`, `F5`, `F#5`, `G5`, `G#5`, `A5`, `Bb5`, `B5`, `C5`, `C#5`, `D5`, `Eb5`, plus 9th power chords (`E5(add9)`, `A5(add9)`, `D5(add9)`) and drop voicings.
-   - **All 12 Roots**: `E`, `A`, `D`, `G`, `B`, `C`, `F`, `F♯`, `C♯`, `G♯`, `D♯`, `B♭`.
-   - **Quality Filters**: Power, Major, Minor, 7th, Dim / Aug, Suspended, Extended.
-   - **Slide-Up Modal**: Tap any chord card to smoothly slide up an enlarged view with interactive strings and CAGED fretboard positions.
-2. **Dynamic Capo Transposition**:
-   - Transpose chords dynamically up to fret 7 with sounding name calculation.
-3. **Scales & Modes Studio**:
-   - Pentatonics, Blues, Major Modes (Ionian, Dorian, Phrygian, Lydian, Mixolydian, Aeolian, Locrian), Harmonic/Melodic Minor, and Chromatic scales.
-   - **Soloing Zone (Box 1)** toggle for targeted fretboard practice.
-4. **Practice Drills**:
-   - 60-Second Speed Chord Transition Coach.
-   - Fretboard Blind Note Hunter.
-   - Chord & Interval Ear Training Quiz.
-5. **Pro Metronome Studio**:
-   - 30 to 280 BPM with tap tempo, rhythm subdivisions (quarter, 8ths, triplets, 16ths), visual beat bulbs, and practice speed ladder.
-
----
-
 ## 🚀 Pushing to Your GitHub Repository
 
-To upload this repository to your personal GitHub account:
-
-1. Create a new repository on [GitHub](https://github.com/new) named `ChordCamp-Pro` (leave "Initialize with README" unchecked).
-2. Open terminal in `C:\Users\SurfaceGO1\Desktop\ChordCamp-Pro` and run:
-   ```bash
-   git remote add origin https://github.com/YOUR_GITHUB_USERNAME/ChordCamp-Pro.git
-   git branch -M main
-   git push -u origin main
-   ```
-3. Once pushed:
-   - Go to your repository on GitHub and click the **Actions** tab to view the automated `.apk` build in progress!
-   - Under **Releases** or **Actions Artifacts**, download your compiled Android `.apk` directly to your phone.
-
----
-
-## 📄 License
-MIT License. Free to use, customize, and share offline!
+```bash
+git remote add origin https://github.com/YOUR_GITHUB_USERNAME/ChordCamp-Pro.git
+git push -u origin main
+```
+Once pushed, check the **Actions** tab on GitHub to see your Android `.apk` build automatically.
