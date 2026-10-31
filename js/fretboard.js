@@ -28,7 +28,7 @@ function renderScaleSelectorCards() {
     <div class="scale-pick-card ${s.id === activeScaleId ? 'active' : ''}" onclick="selectScale('${s.id}')">
       <div class="scale-pick-title">
         <span>${s.name}</span>
-        <span style="font-size:11px;color:var(--lime)">${s.formula.split(' ')[0]}</span>
+        <span class="scale-pick-badge">${s.intervals.length} notes</span>
       </div>
       <div class="scale-pick-sub">${s.sub}</div>
     </div>

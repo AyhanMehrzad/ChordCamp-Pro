@@ -109,17 +109,32 @@ function setChordPosition(idx) {
   playActiveChord('strum');
 }
 
+function formatPositionBtnHtml(p, idx) {
+  const posBadge = `Pos ${idx + 1}`;
+  let posSub = '';
+  const raw = (p.label || '').trim();
+  const parenMatch = raw.match(/\((.*?)\)/);
+  if (parenMatch && parenMatch[1]) {
+    posSub = parenMatch[1];
+  } else {
+    const cleaned = raw.replace(/^Pos\s*\d+\s*/i, '').trim();
+    posSub = cleaned || (idx === 0 ? 'Open' : `Fret ${p.f ? Math.min(...p.f.filter(x => x > 0)) : idx * 2}`);
+  }
+  return `
+    <button class="pos-btn ${idx === activePositionIndex ? 'active' : ''}" onclick="setChordPosition(${idx})" title="${p.label || posBadge}">
+      <span class="pos-badge">${posBadge}</span>
+      <span class="pos-sub">${posSub}</span>
+    </button>
+  `;
+}
+
 function renderPositionPills(chord) {
   const container = document.getElementById('stagePositionPills');
   const positions = chord.positions || [
     { label: 'Pos 1 (Standard)', f: chord.f, fingers: chord.fingers }
   ];
 
-  container.innerHTML = positions.map((p, idx) => `
-    <button class="pos-btn ${idx === activePositionIndex ? 'active' : ''}" onclick="setChordPosition(${idx})">
-      ${p.label}
-    </button>
-  `).join('');
+  container.innerHTML = positions.map((p, idx) => formatPositionBtnHtml(p, idx)).join('');
 }
 
 function createChordSvg(chord, isInteractive = false) {
@@ -349,11 +364,7 @@ function renderChordSheet(c) {
       { label: 'Pos 1 (Standard)', f: c.f, fingers: c.fingers }
     ];
     posWrap.style.display = positions.length > 1 ? 'flex' : 'none';
-    posContainer.innerHTML = positions.map((p, idx) => `
-      <button class="pos-btn ${idx === activePositionIndex ? 'active' : ''}" onclick="setChordPosition(${idx})">
-        ${p.label}
-      </button>
-    `).join('');
+    posContainer.innerHTML = positions.map((p, idx) => formatPositionBtnHtml(p, idx)).join('');
   }
 
   const diagContainer = document.getElementById('sheetDiagramContainer');

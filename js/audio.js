@@ -190,17 +190,20 @@ function updateDroneUI() {
   const dockBtn = document.getElementById('dockDroneBtn');
   const icon = document.getElementById('droneBtnIcon');
   const text = document.getElementById('droneBtnText');
+  const bar = document.querySelector('.drone-mini-bar');
 
   if (droneActive) {
-    btn.classList.add('playing');
-    dockBtn.classList.add('active');
-    icon.textContent = '⏹';
-    text.textContent = 'Stop Drone';
+    if (btn) btn.classList.add('active', 'playing');
+    if (dockBtn) dockBtn.classList.add('active');
+    if (bar) bar.classList.add('drone-playing');
+    if (icon) icon.textContent = '⏹';
+    if (text) text.textContent = 'Stop Drone';
   } else {
-    btn.classList.remove('playing');
-    dockBtn.classList.remove('active');
-    icon.textContent = '▶';
-    text.textContent = 'Start Drone';
+    if (btn) btn.classList.remove('active', 'playing');
+    if (dockBtn) dockBtn.classList.remove('active');
+    if (bar) bar.classList.remove('drone-playing');
+    if (icon) icon.textContent = '▶';
+    if (text) text.textContent = 'Start Drone';
   }
 }
 

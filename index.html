@@ -48,25 +48,7 @@
     </div>
   </header>
 
-  <!-- Navigation Hub Tabs -->
-  <nav class="hub-tabs" aria-label="Main Navigation">
-    <button class="hub-tab active" data-hub="chords" onclick="switchHub('chords')">
-      <span class="icon">🎸</span>
-      <span>Chord Playground</span>
-    </button>
-    <button class="hub-tab" data-hub="modes" onclick="switchHub('modes')">
-      <span class="icon">🧪</span>
-      <span>Scales & Modes</span>
-    </button>
-    <button class="hub-tab" data-hub="drills" onclick="switchHub('drills')">
-      <span class="icon">⏱️</span>
-      <span>Practice Drills</span>
-    </button>
-    <button class="hub-tab" data-hub="metronome" onclick="switchHub('metronome')">
-      <span class="icon">🥁</span>
-      <span>Pro Metronome</span>
-    </button>
-  </nav>
+
 
   <!-- ========================================== -->
   <!-- HUB 1: CHORDS & INTERACTIVE STAGE         -->
@@ -125,10 +107,13 @@
 
       <!-- MULTI-POSITION SELECTOR BAR -->
       <div class="positions-bar-wrap">
-        <span class="positions-label">
-          <span>📐</span>
-          <span>Neck Positions:</span>
-        </span>
+        <div class="positions-header">
+          <span class="positions-label">
+            <span>📐</span>
+            <span>Neck Positions</span>
+          </span>
+          <span class="positions-hint">CAGED Inversions</span>
+        </div>
         <div class="position-pills" id="stagePositionPills"></div>
       </div>
 
@@ -186,16 +171,25 @@
     <!-- Top Friendly Category Switcher -->
     <div class="scale-category-tabs">
       <button class="scale-cat-btn active" data-cat="pentatonic" onclick="setScaleCategory('pentatonic')">
-        <span>🎸</span>
-        <span>Pentatonic & Blues (The Essentials)</span>
+        <span class="cat-icon">🎸</span>
+        <span class="cat-text">
+          <span class="cat-title">Pentatonic</span>
+          <span class="cat-sub">Blues & Rock</span>
+        </span>
       </button>
       <button class="scale-cat-btn" data-cat="modes" onclick="setScaleCategory('modes')">
-        <span>🌟</span>
-        <span>The 7 Modes (Plain English Moods)</span>
+        <span class="cat-icon">🌟</span>
+        <span class="cat-text">
+          <span class="cat-title">7 Modes</span>
+          <span class="cat-sub">Musical Moods</span>
+        </span>
       </button>
       <button class="scale-cat-btn" data-cat="technique" onclick="setScaleCategory('technique')">
-        <span>⚡</span>
-        <span>Shred & Speed (3NPS / Chromatic)</span>
+        <span class="cat-icon">⚡</span>
+        <span class="cat-text">
+          <span class="cat-title">Speed</span>
+          <span class="cat-sub">3NPS / Shred</span>
+        </span>
       </button>
     </div>
 
@@ -206,9 +200,14 @@
     <div class="scale-view-panel">
       <!-- Ambient Drone Bar -->
       <div class="drone-mini-bar">
-        <div style="font-size:12px;color:var(--text)">
-          <strong style="color:var(--lime)">🎵 Continuous Jamming Drone (<span id="droneRootDisplay">A</span> Root + 5th):</strong>
-          <span style="color:var(--muted)">Turn this on and solo with the scale notes below!</span>
+        <div class="drone-bar-info">
+          <span class="drone-pulse-indicator" id="dronePulseDot"></span>
+          <div>
+            <div style="font-size:12.5px;font-weight:700;color:var(--text)">
+              🎵 Continuous Jamming Drone (<span id="droneRootDisplay" style="color:var(--lime)">A</span> Root + 5th)
+            </div>
+            <div style="font-size:11px;color:var(--muted)">Turn this on and solo with the scale notes below!</div>
+          </div>
         </div>
         <button class="drone-mini-btn" id="droneToggleBtn" onclick="toggleDrone()">
           <span id="droneBtnIcon">▶</span>

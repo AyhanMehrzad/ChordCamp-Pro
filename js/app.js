@@ -6,13 +6,25 @@ function switchHub(hubId) {
   const targetView = document.getElementById(`hub-${hubId}`);
   if (targetView) targetView.classList.add('active');
 
-  document.querySelectorAll('.hub-tab').forEach(t => {
-    t.classList.toggle('active', t.dataset.hub === hubId);
-  });
-
   document.querySelectorAll('.dock-hub-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.dock === hubId);
   });
+
+  // Contextually adapt dock primary action button
+  const strumBtn = document.getElementById('dockStrumBtn');
+  const chordNameSpan = document.getElementById('dockChordName');
+  if (strumBtn && chordNameSpan) {
+    if (hubId === 'modes') {
+      chordNameSpan.textContent = 'Play Scale';
+      strumBtn.onclick = () => playScaleNotesAscending();
+    } else if (hubId === 'metronome') {
+      chordNameSpan.textContent = 'Tap Beat';
+      strumBtn.onclick = () => toggleMetronome();
+    } else {
+      chordNameSpan.textContent = `Play ${typeof activeChordName !== 'undefined' ? activeChordName : 'Am'}`;
+      strumBtn.onclick = () => playActiveChord('strum');
+    }
+  }
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
