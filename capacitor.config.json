@@ -1,7 +1,7 @@
 {
   "appId": "com.chordcamp.pro",
   "appName": "ChordCamp Pro",
-  "webDir": ".",
+  "webDir": "dist",
   "bundledWebRuntime": false,
   "server": {
     "androidScheme": "https"
