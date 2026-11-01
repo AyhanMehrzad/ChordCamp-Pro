@@ -139,3 +139,86 @@ function checkQuizAnswer(guess) {
     toast(`Incorrect, it was ${quizMode}. Try another!`);
   }
 }
+
+/* -------------------------------------------------------------
+   DRILL 4: INTERACTIVE NOTE SEQUENCE WITH PITCH LISTENER
+------------------------------------------------------------- */
+let listenerDrillRunning = false;
+let listenerSequence = ['E', 'G', 'A', 'B', 'D'];
+let listenerStepIdx = 0;
+let listenerScore = 0;
+
+function startListenerDrill(exerciseName = 'Pentatonic Box 1') {
+  if (exerciseName === 'Major Triad') {
+    listenerSequence = ['C', 'E', 'G', 'C'];
+  } else if (exerciseName === 'Blues Lick') {
+    listenerSequence = ['A', 'C', 'D', 'D♯', 'E', 'G'];
+  } else {
+    listenerSequence = ['E', 'G', 'A', 'B', 'D', 'E'];
+  }
+
+  listenerDrillRunning = true;
+  listenerStepIdx = 0;
+  listenerScore = 0;
+
+  const btn = document.getElementById('btnStartListenerDrill');
+  if (btn) btn.textContent = '⏹ Stop Note Drill';
+
+  renderListenerDrillStep();
+  toast(`👂 Starting ${exerciseName} Drill!`);
+}
+
+function renderListenerDrillStep() {
+  if (!listenerDrillRunning) return;
+  const currentNote = listenerSequence[listenerStepIdx];
+  const targetEl = document.getElementById('drillActiveNoteTarget');
+  if (targetEl) targetEl.textContent = currentNote;
+
+  const progressEl = document.getElementById('drillSeqProgress');
+  if (progressEl) {
+    progressEl.innerHTML = listenerSequence.map((n, i) => `
+      <span class="drill-step-chip ${i === listenerStepIdx ? 'active' : (i < listenerStepIdx ? 'completed' : '')}">${n}</span>
+    `).join('');
+  }
+
+  // Hook into tuner listener engine
+  if (typeof setDrillListenerTarget === 'function') {
+    setDrillListenerTarget(currentNote, () => {
+      advanceListenerDrill();
+    });
+  }
+}
+
+function advanceListenerDrill() {
+  if (!listenerDrillRunning) return;
+  if (typeof playGuitarString === 'function') {
+    playGuitarString(55 + listenerStepIdx * 2, 0.4, 0, 0.15);
+  }
+  listenerScore++;
+  listenerStepIdx++;
+
+  if (listenerStepIdx >= listenerSequence.length) {
+    toast('🎉 Sequence Completed! Great pitch accuracy!');
+    listenerStepIdx = 0;
+  }
+  renderListenerDrillStep();
+}
+
+function stopListenerDrill() {
+  listenerDrillRunning = false;
+  const btn = document.getElementById('btnStartListenerDrill');
+  if (btn) btn.textContent = '▶ Start Note Drill';
+  if (typeof setDrillListenerTarget === 'function') {
+    setDrillListenerTarget(null, null);
+  }
+  const feedback = document.getElementById('drillListenerFeedback');
+  if (feedback) feedback.innerHTML = '<span>Drill stopped.</span>';
+}
+
+function toggleListenerDrill() {
+  if (listenerDrillRunning) {
+    stopListenerDrill();
+  } else {
+    startListenerDrill();
+  }
+}

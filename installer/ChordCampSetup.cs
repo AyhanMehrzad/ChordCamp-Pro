@@ -27,12 +27,13 @@ namespace ChordCampInstaller
         private CheckBox chkDesktop;
         private CheckBox chkStartMenu;
         private CheckBox chkLaunch;
+        private CheckBox chkStartup;
         private TextBox txtInstallPath;
 
         public InstallerForm()
         {
             this.Text = "ChordCamp Pro — Windows Setup";
-            this.Size = new Size(520, 390);
+            this.Size = new Size(520, 430);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.StartPosition = FormStartPosition.CenterScreen;
             this.MaximizeBox = false;
@@ -84,35 +85,42 @@ namespace ChordCampInstaller
             chkDesktop = new CheckBox();
             chkDesktop.Text = "Create Desktop Shortcut (with custom rock guitar icon)";
             chkDesktop.Checked = true;
-            chkDesktop.Location = new Point(25, 160);
+            chkDesktop.Location = new Point(25, 155);
             chkDesktop.AutoSize = true;
             this.Controls.Add(chkDesktop);
 
             chkStartMenu = new CheckBox();
             chkStartMenu.Text = "Add to Windows Start Menu Programs";
             chkStartMenu.Checked = true;
-            chkStartMenu.Location = new Point(25, 190);
+            chkStartMenu.Location = new Point(25, 182);
             chkStartMenu.AutoSize = true;
             this.Controls.Add(chkStartMenu);
 
             chkLaunch = new CheckBox();
             chkLaunch.Text = "Launch ChordCamp Pro immediately after installation";
             chkLaunch.Checked = true;
-            chkLaunch.Location = new Point(25, 220);
+            chkLaunch.Location = new Point(25, 209);
             chkLaunch.AutoSize = true;
             this.Controls.Add(chkLaunch);
+
+            chkStartup = new CheckBox();
+            chkStartup.Text = "Launch ChordCamp Pro on Windows Startup (Keep ready for daily practice)";
+            chkStartup.Checked = false;
+            chkStartup.Location = new Point(25, 236);
+            chkStartup.AutoSize = true;
+            this.Controls.Add(chkStartup);
 
             // Status label
             lblStatus = new Label();
             lblStatus.Text = "Ready to install.";
-            lblStatus.Location = new Point(24, 252);
+            lblStatus.Location = new Point(24, 268);
             lblStatus.ForeColor = Color.FromArgb(170, 190, 165);
             lblStatus.AutoSize = true;
             this.Controls.Add(lblStatus);
 
             // Progress bar
             progressBar = new ProgressBar();
-            progressBar.Location = new Point(24, 275);
+            progressBar.Location = new Point(24, 292);
             progressBar.Size = new Size(455, 14);
             progressBar.Visible = false;
             this.Controls.Add(progressBar);
@@ -120,7 +128,7 @@ namespace ChordCampInstaller
             // Install button
             btnInstall = new Button();
             btnInstall.Text = "Install ChordCamp Pro";
-            btnInstall.Location = new Point(24, 300);
+            btnInstall.Location = new Point(24, 320);
             btnInstall.Size = new Size(455, 38);
             btnInstall.BackColor = Color.FromArgb(216, 255, 101);
             btnInstall.ForeColor = Color.FromArgb(12, 20, 10);
@@ -232,6 +240,21 @@ namespace ChordCampInstaller
                     CreateShortcut(shortcut, exePath, targetDir, iconPath, "ChordCamp Pro — Interactive Guitar Playground");
                 }
 
+                if (chkStartup.Checked)
+                {
+                    try
+                    {
+                        using (Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true))
+                        {
+                            if (key != null)
+                            {
+                                key.SetValue("ChordCampPro", "\"" + exePath + "\"");
+                            }
+                        }
+                    }
+                    catch { }
+                }
+
                 // Create uninstaller
                 string uninstallerPath = Path.Combine(targetDir, "Uninstall.bat");
                 File.WriteAllText(uninstallerPath,
@@ -240,6 +263,7 @@ namespace ChordCampInstaller
                     "echo Removing desktop shortcuts...\r\n" +
                     "del /q \"%USERPROFILE%\\Desktop\\ChordCamp Pro.lnk\" 2>nul\r\n" +
                     "del /q \"%APPDATA%\\Microsoft\\Windows\\Start Menu\\Programs\\ChordCamp Pro.lnk\" 2>nul\r\n" +
+                    "reg delete \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v ChordCampPro /f 2>nul\r\n" +
                     "echo Removing application files...\r\n" +
                     "cd ..\r\n" +
                     "rmdir /s /q \"" + targetDir + "\" 2>nul\r\n" +

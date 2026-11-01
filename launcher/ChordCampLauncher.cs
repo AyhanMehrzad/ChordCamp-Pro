@@ -62,10 +62,11 @@ namespace ChordCampApp
 
                 if (browserExe != null)
                 {
-                    // Launch in clean borderless / dedicated standalone app mode (no browser address bar, feels 100% like a native desktop app!)
+                    // Launch in clean borderless / dedicated standalone app mode (isolated user profile, no browser address bar/tabs)
+                    string userDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ChordCamp-Pro", "Data");
                     ProcessStartInfo psi = new ProcessStartInfo();
                     psi.FileName = browserExe;
-                    psi.Arguments = string.Format("--app=\"{0}\" --enable-features=OverlayScrollbar --disable-features=Translate", fileUri);
+                    psi.Arguments = string.Format("--app=\"{0}\" --user-data-dir=\"{1}\" --app-id=\"ChordCampPro\" --window-size=1200,820 --enable-features=OverlayScrollbar --disable-features=Translate --disable-extensions", fileUri, userDataDir);
                     psi.UseShellExecute = false;
                     Process.Start(psi);
                 }

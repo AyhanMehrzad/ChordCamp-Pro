@@ -537,6 +537,25 @@ function playActiveChord(mode = 'strum') {
   toast(`${mode === 'arpeggio' ? '🎶 Slow Picking' : '🔊 Strumming'} ${c.name} ${capoMsg}`);
 }
 
+function handleChordSearch(val) {
+  const clearBtn = document.getElementById('chordSearchClearBtn');
+  if (clearBtn) {
+    clearBtn.style.display = val && val.trim().length > 0 ? 'inline-flex' : 'none';
+  }
+  renderChordGrid();
+}
+
+function clearChordSearch() {
+  const input = document.getElementById('chordSearchInput');
+  if (input) {
+    input.value = '';
+    input.focus();
+  }
+  const clearBtn = document.getElementById('chordSearchClearBtn');
+  if (clearBtn) clearBtn.style.display = 'none';
+  renderChordGrid();
+}
+
 function renderChordGrid() {
   const query = (document.getElementById('chordSearchInput')?.value || '').trim().toLowerCase();
   const grid = document.getElementById('chordGrid');

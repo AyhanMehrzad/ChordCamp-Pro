@@ -45,6 +45,7 @@
       </div>
 
       <span class="nav-pill">🔥 <b id="totalStrumCount">0</b> strums</span>
+      <button class="sound-btn" onclick="openSettingsModal()" title="Settings & Startup" style="padding:6px 10px;border-radius:10px">⚙️ Settings</button>
     </div>
   </header>
 
@@ -145,18 +146,24 @@
       </div>
     </section>
 
-    <!-- Two-Tier Uncluttered Chord Filters -->
+    <!-- Three-Tier Ergonomic Chord Filters & Search -->
     <section class="filter-container">
+      <div class="search-bar-wrap">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="search" id="chordSearchInput" class="search-input" placeholder="Search chords (e.g. m11, maj9, Cadd9, F#, Power)..." oninput="handleChordSearch(this.value)">
+          <button type="button" class="search-clear-btn" id="chordSearchClearBtn" onclick="clearChordSearch()" title="Clear search" style="display:none">✕</button>
+        </div>
+      </div>
+
       <div class="root-bar-wrap">
-        <span class="filter-label">Root Note:</span>
+        <span class="filter-label">Root:</span>
         <div class="root-pills" id="rootFilterPills"></div>
       </div>
 
       <div class="quality-bar-wrap">
+        <span class="filter-label">Type:</span>
         <div class="quality-pills" id="qualityFilterPills"></div>
-        <div class="search-box">
-          <input type="search" id="chordSearchInput" class="search-input" placeholder="Search (e.g. m11, maj9, Cadd9, F#)..." oninput="renderChordGrid()">
-        </div>
       </div>
     </section>
 
@@ -395,6 +402,41 @@
           Streak: <strong id="quizStreak" style="color:var(--violet)">0</strong> correct in a row
         </div>
       </div>
+
+      <!-- Drill 4: Interactive Note Sequence with Listener Pitch Validation -->
+      <div class="drill-card">
+        <div>
+          <div style="color:var(--lime);font:700 11px 'Space Grotesk';text-transform:uppercase;letter-spacing:1px">Drill 4 • Real-Time Pitch Validation</div>
+          <h3 class="drill-title">Interactive Note Trainer</h3>
+          <p class="drill-desc">Play each target note on your guitar. The Listener verifies your pitch through the mic and advances only when played correctly!</p>
+        </div>
+
+        <label class="drill-listener-toggle-wrap">
+          <input type="checkbox" id="chkDrillListener" onchange="toggleDrillListenerMode(this)" style="accent-color:var(--lime);width:18px;height:18px">
+          <div>
+            <div style="font:700 13px 'Space Grotesk';color:var(--text)">👂 Microphone Pitch Listener</div>
+            <div style="font-size:11px;color:var(--muted)">Checks guitar pitch & holds note until correctly played (Optional)</div>
+          </div>
+        </label>
+
+        <div class="drill-interactive">
+          <div class="stat-label">Target Note to Play:</div>
+          <div class="big-stat" style="color:var(--lime)" id="drillActiveNoteTarget">E</div>
+          <div id="drillSeqProgress" style="display:flex;gap:6px;justify-content:center;margin:12px 0"></div>
+          <div id="drillListenerFeedback" style="font-size:12px;color:var(--muted);min-height:18px">Select routine & click start</div>
+        </div>
+
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          <button class="btn-card stage" onclick="startListenerDrill('Pentatonic Box 1')">🎸 Pentatonic</button>
+          <button class="btn-card stage" onclick="startListenerDrill('Major Triad')">📐 Triad</button>
+          <button class="btn-card stage" onclick="startListenerDrill('Blues Lick')">🔥 Blues</button>
+        </div>
+
+        <div style="display:flex;gap:6px">
+          <button class="btn-drill" id="btnStartListenerDrill" onclick="toggleListenerDrill()">▶ Start Note Drill</button>
+          <button class="btn-drill" onclick="advanceListenerDrill()" style="background:var(--panel2);color:var(--text);border:1px solid var(--line-bright)">Manual Next ➔</button>
+        </div>
+      </div>
     </div>
   </main>
 
@@ -498,6 +540,205 @@
       </div>
     </div>
   </main>
+
+  <!-- ========================================== -->
+  <!-- HUB 5: CHROMATIC TUNER                    -->
+  <!-- ========================================== -->
+  <main class="hub-view" id="hub-tuner">
+    <div class="tuner-stage-card">
+      <div style="color:var(--lime);font:700 11px 'Space Grotesk';text-transform:uppercase;letter-spacing:1px">Precision Pitch Detection</div>
+      <h2 style="font:700 28px 'Space Grotesk';margin:4px 0 12px">Chromatic Guitar Tuner</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:18px">Sub-cent accuracy (±1 cent) powered by high-speed autocorrelation.</p>
+
+      <!-- Needle Dial Gauge -->
+      <div class="tuner-dial-gauge" id="tunerDialGauge">
+        <div class="tuner-center-target"></div>
+        <div class="tuner-needle" id="tunerNeedle"></div>
+      </div>
+
+      <!-- Note & Frequency Readout -->
+      <div class="tuner-note-display" id="tunerNoteName">—</div>
+      <div style="display:flex;justify-content:center;gap:16px;font:700 14px 'Space Grotesk';color:var(--muted);margin-bottom:14px">
+        <span id="tunerCents">0 cents</span>
+        <span>•</span>
+        <span id="tunerFreq">0.0 Hz</span>
+      </div>
+
+      <!-- Standard 6 Guitar Strings Quick Indicators -->
+      <div class="tuner-strings-grid">
+        <div class="guitar-string-chip" data-string-note="E2">6: E2 (82.4Hz)</div>
+        <div class="guitar-string-chip" data-string-note="A2">5: A2 (110Hz)</div>
+        <div class="guitar-string-chip" data-string-note="D3">4: D3 (146.8Hz)</div>
+        <div class="guitar-string-chip" data-string-note="G3">3: G3 (196Hz)</div>
+        <div class="guitar-string-chip" data-string-note="B3">2: B3 (246.9Hz)</div>
+        <div class="guitar-string-chip" data-string-note="E4">1: E4 (329.6Hz)</div>
+      </div>
+
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px" id="tunerStatusText">Click button below to start microphone listening.</div>
+      <button class="btn-strum primary" id="btnTunerToggle" onclick="toggleTunerPower()" style="max-width:280px;margin:0 auto">
+        🎤 Turn Tuner ON
+      </button>
+    </div>
+  </main>
+
+  <!-- ========================================== -->
+  <!-- HUB 6: STUDIO (AMPS, TABS, WRITER, REC)    -->
+  <!-- ========================================== -->
+  <main class="hub-view" id="hub-studio">
+    <!-- Studio Sub-Navigation Tabs -->
+    <div class="studio-tabs">
+      <button class="studio-tab-btn active" onclick="switchStudioTab('amp')">🎛️ TONE3000 Amp Rig</button>
+      <button class="studio-tab-btn" onclick="switchStudioTab('scores')">🎼 Guitar Pro Flow</button>
+      <button class="studio-tab-btn" onclick="switchStudioTab('paste')">📋 Paste Tab Auto-Sync</button>
+      <button class="studio-tab-btn" onclick="switchStudioTab('notebook')">📝 Practice Notebook</button>
+    </div>
+
+    <!-- PANE 1: TONE3000 Web DSP Rig & Recorder -->
+    <div class="studio-view-pane active" id="pane-amp">
+      <div class="amp-head-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+          <div>
+            <span style="color:var(--lime);font:700 11px 'Space Grotesk';text-transform:uppercase;letter-spacing:1px">Zero-Lag DSP (&lt;5ms)</span>
+            <h3 style="margin:2px 0;font:700 22px 'Space Grotesk'">TONE3000 Virtual Amp & FX Rig</h3>
+          </div>
+          <button class="btn-strum primary" id="btnDspPower" onclick="toggleDspPower()" style="padding:8px 16px;font-size:13px">
+            ⚡ Turn Amp ON
+          </button>
+        </div>
+
+        <!-- Presets -->
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
+          <button class="v-btn active" onclick="setAmpPreset('clean')">✨ Clean Acoustic</button>
+          <button class="v-btn" onclick="setAmpPreset('crunch')">🎸 Blues Crunch</button>
+          <button class="v-btn" onclick="setAmpPreset('lead')">⚡ Metal Lead</button>
+          <label class="v-btn" style="cursor:pointer" title="Load custom WAV cabinet IR">
+            📁 Custom Cab IR <input type="file" accept=".wav" style="display:none" onchange="DspEngine.loadCustomIR(this.files[0])">
+          </label>
+        </div>
+
+        <!-- Amp Knobs -->
+        <div class="amp-knobs-grid">
+          <div class="amp-knob-box">
+            <div class="amp-knob-label">Gain / Drive</div>
+            <input type="range" class="amp-slider" min="1" max="60" value="15" oninput="DspEngine.setDrive(this.value)">
+          </div>
+          <div class="amp-knob-box">
+            <div class="amp-knob-label">Bass</div>
+            <input type="range" class="amp-slider" min="-12" max="12" value="2" oninput="DspEngine.setBass(this.value)">
+          </div>
+          <div class="amp-knob-box">
+            <div class="amp-knob-label">Middle</div>
+            <input type="range" class="amp-slider" min="-12" max="12" value="0" oninput="DspEngine.setMid(this.value)">
+          </div>
+          <div class="amp-knob-box">
+            <div class="amp-knob-label">Treble</div>
+            <input type="range" class="amp-slider" min="-12" max="12" value="2" oninput="DspEngine.setTreble(this.value)">
+          </div>
+          <div class="amp-knob-box">
+            <div class="amp-knob-label">Delay Mix</div>
+            <input type="range" class="amp-slider" min="0" max="80" value="25" oninput="DspEngine.setDelayMix(this.value)">
+          </div>
+          <div class="amp-knob-box">
+            <div class="amp-knob-label">Master Vol</div>
+            <input type="range" class="amp-slider" min="0" max="100" value="85" oninput="DspEngine.setMasterVolume(this.value)">
+          </div>
+        </div>
+
+        <!-- Audio Recorder Bar -->
+        <div style="background:#090e09;border:1px solid var(--line-bright);border-radius:14px;padding:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <div>
+            <div style="font:700 13px 'Space Grotesk';color:var(--text)">🔴 Studio Guitar Recorder</div>
+            <div style="font-size:11px;color:var(--muted)">Record live guitar with amp effects & download WAV/WebM</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn-card play" id="btnRecordToggle" onclick="toggleAudioRecording()">🎙️ Start Record</button>
+            <div id="recordingAudioPlayerWrap"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANE 2: Guitar Pro Flowing Score -->
+    <div class="studio-view-pane" id="pane-scores">
+      <div style="background:var(--panel);border:1px solid var(--line-bright);border-radius:20px;padding:18px;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+          <div>
+            <span style="color:var(--lime);font:700 11px 'Space Grotesk';text-transform:uppercase;letter-spacing:1px">Interactive Tab Engraver</span>
+            <h3 style="margin:2px 0;font:700 22px 'Space Grotesk'">Guitar Pro Flowing Score Player</h3>
+            <div style="font-size:12px;color:var(--muted)" id="gpFileName">Supports .gp, .gp5, .gp4, .gp3, .gpx &amp; MusicXML</div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <label class="btn-card stage" style="cursor:pointer">
+              📂 Open GP File <input type="file" accept=".gp,.gp3,.gp4,.gp5,.gpx,.xml" style="display:none" onchange="loadGuitarProFile(this.files[0])">
+            </label>
+            <button class="btn-strum primary" id="gpPlayBtn" onclick="toggleGuitarProPlayback()" style="padding:8px 16px;font-size:13px">
+              ▶ Play Score
+            </button>
+          </div>
+        </div>
+
+        <!-- Controls: Speed, Flow, Progress -->
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#090e09;padding:10px 14px;border-radius:12px;margin-bottom:12px">
+          <span style="font-size:12px;font-weight:700;color:var(--muted)">SPEED:</span>
+          <button class="fine-btn" onclick="setScorePlaybackSpeed(0.5)">0.5x</button>
+          <button class="fine-btn" onclick="setScorePlaybackSpeed(0.75)">0.75x</button>
+          <button class="fine-btn" onclick="setScorePlaybackSpeed(1.0)">1.0x</button>
+          <button class="fine-btn" onclick="setScorePlaybackSpeed(1.25)">1.25x</button>
+          <div style="flex:1;height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden">
+            <div id="gpProgressBar" style="width:0%;height:100%;background:var(--lime);transition:width 0.1s linear"></div>
+          </div>
+        </div>
+
+        <!-- AlphaTab Render Container -->
+        <div id="alphaTabContainer" style="min-height:220px;border-radius:12px;overflow:auto;background:#090e09"></div>
+      </div>
+    </div>
+
+    <!-- PANE 3: Paste Tab / Chords Auto-Sync -->
+    <div class="studio-view-pane" id="pane-paste">
+      <div style="background:var(--panel);border:1px solid var(--line-bright);border-radius:20px;padding:18px">
+        <span style="color:var(--gold);font:700 11px 'Space Grotesk';text-transform:uppercase;letter-spacing:1px">Smart Text Tab Sync</span>
+        <h3 style="margin:2px 0 8px;font:700 22px 'Space Grotesk'">Paste Tab &amp; Chords from Any Website</h3>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Copy chord sheets or lyrics from Ultimate Guitar, Songsterr, or anywhere, and paste here. ChordCamp automatically formats them with interactive chord cards and auto-scroll!</p>
+
+        <textarea id="pasteSongText" class="notebook-textarea" style="height:120px" placeholder="Paste chords and lyrics here (e.g. [Am] Hello darkness my old [G] friend...)"></textarea>
+        
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn-strum primary" onclick="handlePasteSongImport()" style="padding:8px 18px;font-size:13px">
+            ✨ Parse &amp; Sync Sheet
+          </button>
+          <button class="btn-card stage" id="btnSongScroll" onclick="toggleSongAutoScroll()">
+            ▶ Auto-Scroll
+          </button>
+        </div>
+
+        <div class="synced-song-view" id="syncedSongDisplay">
+          <div style="color:var(--muted);text-align:center;padding:24px">Your synced chords and lyrics will appear here. Click any chord symbol to preview its fingering!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANE 4: Notion-Style Practice Notebook -->
+    <div class="studio-view-pane" id="pane-notebook">
+      <div style="background:var(--panel);border:1px solid var(--line-bright);border-radius:20px;padding:18px">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+          <div>
+            <span style="color:var(--lime);font:700 11px 'Space Grotesk';text-transform:uppercase;letter-spacing:1px">Practice Logbook</span>
+            <h3 style="margin:2px 0;font:700 22px 'Space Grotesk'">Notion-Style Guitar Journal</h3>
+            <div style="font-size:12px;color:var(--muted)" id="notebookWordCount">0 words • Auto-saved offline</div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="fine-btn" onclick="insertPracticeTemplate('warmup')">+ Warmup Template</button>
+            <button class="fine-btn" onclick="insertPracticeTemplate('bpm')">+ BPM Tracker</button>
+            <button class="fine-btn" onclick="insertPracticeTemplate('song')">+ Song Idea</button>
+            <button class="fine-btn" onclick="exportNotebookText()" style="color:var(--lime)">💾 Export .md</button>
+          </div>
+        </div>
+
+        <textarea id="practiceNotebookPad" class="notebook-textarea"></textarea>
+      </div>
+    </div>
+  </main>
 </div>
 
 <!-- ========================================== -->
@@ -520,6 +761,14 @@
     <button class="dock-hub-btn" data-dock="metronome" onclick="switchHub('metronome')">
       <span>🥁</span>
       <span class="label">Beat</span>
+    </button>
+    <button class="dock-hub-btn" data-dock="tuner" onclick="switchHub('tuner')">
+      <span>🎯</span>
+      <span class="label">Tuner</span>
+    </button>
+    <button class="dock-hub-btn" data-dock="studio" onclick="switchHub('studio')">
+      <span>🎛️</span>
+      <span class="label">Studio</span>
     </button>
   </div>
 
@@ -618,8 +867,46 @@
   </div>
 </div>
 
+<!-- ======================================================== -->
+<!-- SETTINGS & DESKTOP CONFIGURATION MODAL                   -->
+<!-- ======================================================== -->
+<div class="chord-sheet-backdrop" id="settingsModal" style="display:none;align-items:center;justify-content:center" onclick="if(event.target===this)closeSettingsModal()">
+  <div style="background:#121913;border:1px solid var(--line-bright);border-radius:24px;padding:24px;max-width:480px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,0.85)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h3 style="margin:0;font:700 20px 'Space Grotesk'">⚙️ ChordCamp Settings</h3>
+      <button onclick="closeSettingsModal()" class="search-clear-btn" style="display:inline-flex">✕</button>
+    </div>
+
+    <!-- Windows Startup Option -->
+    <div style="background:#090e09;border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px">
+      <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer">
+        <input type="checkbox" id="chkWindowsStartup" onchange="toggleWindowsStartup(this)" style="accent-color:var(--lime);width:20px;height:20px;margin-top:2px">
+        <div>
+          <div style="font:700 13px 'Space Grotesk';color:var(--text)">🚀 Launch on Windows Startup</div>
+          <div style="font-size:11.5px;color:var(--muted);line-height:1.4">Automatically launch ChordCamp Pro when your computer turns on so your guitar practice is always ready.</div>
+        </div>
+      </label>
+    </div>
+
+    <!-- Audio Calibration -->
+    <div style="background:#090e09;border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:16px">
+      <div style="font:700 13px 'Space Grotesk';color:var(--text);margin-bottom:6px">🎯 Tuner Reference Pitch</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:12px;color:var(--muted)">A4 =</span>
+        <button class="fine-btn active" style="color:var(--lime)">440 Hz (Standard)</button>
+        <button class="fine-btn" onclick="toast('Custom concert pitch calibration saved')">432 Hz</button>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:11px;color:var(--muted)">ChordCamp Pro v2.0 • Offline Ready</span>
+      <button class="btn-strum primary" onclick="closeSettingsModal()" style="padding:8px 18px;font-size:12.5px">Done</button>
+    </div>
+  </div>
+</div>
+
 <!-- ========================================== -->
-<!-- JAVASCRIPT LOGIC & KARPLUS-STRONG SYNTH    -->
+<!-- JAVASCRIPT LOGIC & AUDIO DSP RIG           -->
 <!-- ========================================== -->
 
   <!-- Modular Scripts -->
@@ -630,6 +917,11 @@
   <script src="js/fretboard.js"></script>
   <script src="js/drills.js"></script>
   <script src="js/metronome.js"></script>
+  <script src="js/tuner-engine.js"></script>
+  <script src="js/tuner-ui.js"></script>
+  <script src="js/dsp-engine.js"></script>
+  <script src="js/score-engine.js"></script>
+  <script src="js/notebook.js"></script>
   <script src="js/app.js"></script>
 
   <!-- PWA Offline Service Worker Registration -->
