@@ -4,7 +4,7 @@
    Optimized for acoustic & electric guitars with parabolic peak interpolation
    ========================================================================== */
 
-(function() {
+(function () {
   'use strict';
 
   // Tuner State
@@ -347,7 +347,7 @@
   }
 
   // Public Methods
-  window.startTuner = async function() {
+  window.startTuner = async function () {
     const toggleBtn = document.getElementById('btnTunerToggle');
     const statusPill = document.getElementById('tunerStatusPill');
 
@@ -409,19 +409,132 @@
       toast('🎯 Guitar Tuner active! Pluck any open string.');
     } catch (err) {
       console.error('Tuner Microphone Error:', err);
-      let errMsg = 'Could not access microphone.';
-      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-        errMsg = 'Microphone permission was denied. Please allow microphone access in system settings or use "Tune By Ear" below!';
-      }
-      alert(errMsg);
-      if (statusPill) {
-        statusPill.textContent = '⚠️ Mic blocked • Use "Tune by Ear" below';
-        statusPill.className = 'tuner-status-pill tune-down';
+      if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+        if (statusPill) {
+          statusPill.textContent = '🔌 No mic found • Tap for help';
+          statusPill.className = 'tuner-status-pill tune-down';
+          statusPill.onclick = () => window.openTunerModal('no_device');
+        }
+        window.openTunerModal('no_device');
+      } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+        if (statusPill) {
+          statusPill.textContent = '🎙️ Mic in use • Tap for help';
+          statusPill.className = 'tuner-status-pill tune-down';
+          statusPill.onclick = () => window.openTunerModal('busy');
+        }
+        window.openTunerModal('busy');
+      } else {
+        if (statusPill) {
+          statusPill.textContent = '⚠️ Mic permission needed • Tap to allow';
+          statusPill.className = 'tuner-status-pill tune-down';
+          statusPill.onclick = () => window.openTunerModal('permission');
+        }
+        window.openTunerModal('permission');
       }
     }
   };
 
-  window.stopTuner = function() {
+  window.openTunerModal = function (type) {
+    const modal = document.getElementById('tunerMicModal');
+    if (!modal) return;
+
+    const iconEl = document.getElementById('tunerModalIcon');
+    const titleEl = document.getElementById('tunerModalTitle');
+    const descEl = document.getElementById('tunerModalDesc');
+    const stepsEl = document.getElementById('tunerModalSteps');
+    const isAndroid = /android/i.test(navigator.userAgent);
+
+    if (type === 'no_device') {
+      if (iconEl) iconEl.textContent = '🔌';
+      if (titleEl) titleEl.textContent = 'No Microphone Detected';
+      if (descEl) descEl.textContent = 'Your device does not report any connected microphone or audio input hardware.';
+      if (stepsEl) {
+        stepsEl.innerHTML = `
+          <div class="modal-step-item">
+            <span class="step-num">1</span>
+            <div>Connect a USB microphone, 3.5mm headset, or earphones with a microphone.</div>
+          </div>
+          <div class="modal-step-item">
+            <span class="step-num">2</span>
+            <div>If using Windows, ensure your microphone is enabled: Settings ➔ System ➔ Sound ➔ Input.</div>
+          </div>
+          <div class="modal-step-item">
+            <span class="step-num">3</span>
+            <div>You can still tune immediately using <b>Tune by Ear</b> with the acoustic string reference below!</div>
+          </div>
+        `;
+      }
+    } else if (type === 'busy') {
+      if (iconEl) iconEl.textContent = '🎙️';
+      if (titleEl) titleEl.textContent = 'Microphone In Use';
+      if (descEl) descEl.textContent = 'Your microphone is currently reserved exclusively by another active app.';
+      if (stepsEl) {
+        stepsEl.innerHTML = `
+          <div class="modal-step-item">
+            <span class="step-num">1</span>
+            <div>Close background apps that might use audio (Discord, Zoom, OBS, or a DAW).</div>
+          </div>
+          <div class="modal-step-item">
+            <span class="step-num">2</span>
+            <div>Tap <b>Try Again</b> below to reconnect.</div>
+          </div>
+        `;
+      }
+    } else {
+      // Permission denied
+      if (iconEl) iconEl.textContent = '🎤';
+      if (titleEl) titleEl.textContent = 'Microphone Permission Needed';
+      if (descEl) descEl.textContent = 'ChordCamp Pro needs permission to access your microphone to listen to your guitar strings.';
+      if (stepsEl) {
+        if (isAndroid) {
+          stepsEl.innerHTML = `
+            <div class="modal-step-item">
+              <span class="step-num">1</span>
+              <div><b>Android App:</b> Go to phone Settings ➔ Apps ➔ ChordCamp Pro ➔ Permissions ➔ Microphone ➔ Choose <b>"Allow while using app"</b>.</div>
+            </div>
+            <div class="modal-step-item">
+              <span class="step-num">2</span>
+              <div><b>Browser / Chrome:</b> Tap the lock icon 🔒 next to the web address bar ➔ Permissions ➔ Set Microphone to <b>Allow</b>.</div>
+            </div>
+          `;
+        } else {
+          stepsEl.innerHTML = `
+            <div class="modal-step-item">
+              <span class="step-num">1</span>
+              <div>Open <b>Windows Settings</b> ➔ Privacy & Security ➔ <b>Microphone</b>.</div>
+            </div>
+            <div class="modal-step-item">
+              <span class="step-num">2</span>
+              <div>Ensure <b>"Microphone access"</b> is toggled <b>ON</b>.</div>
+            </div>
+            <div class="modal-step-item">
+              <span class="step-num">3</span>
+              <div>Scroll down and ensure <b>"Let desktop apps access your microphone"</b> is toggled <b>ON</b>.</div>
+            </div>
+          `;
+        }
+      }
+    }
+
+    modal.style.display = 'flex';
+  };
+
+  window.closeTunerModal = function () {
+    const modal = document.getElementById('tunerMicModal');
+    if (modal) modal.style.display = 'none';
+  };
+
+  window.switchTunerToEarMode = function () {
+    const headstockCard = document.querySelector('.tuner-headstock-card');
+    if (headstockCard) {
+      headstockCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      headstockCard.classList.add('highlight-ear-mode');
+      setTimeout(() => headstockCard.classList.remove('highlight-ear-mode'), 2000);
+    }
+    toast('👂 Tune by Ear active: Tap any string peg to hear reference pitch!');
+  };
+
+  window.stopTuner = function () {
     isTuningActive = false;
     if (animationFrameId) {
       cancelAnimationFrame(animationFrameId);
@@ -460,7 +573,7 @@
     highlightTunerString(-1);
   };
 
-  window.toggleTuner = function() {
+  window.toggleTuner = function () {
     if (isTuningActive) {
       window.stopTuner();
     } else {
@@ -468,14 +581,14 @@
     }
   };
 
-  window.setTuningPreset = function(presetKey) {
+  window.setTuningPreset = function (presetKey) {
     currentTuningPreset = presetKey;
     lockedStringIndex = -1;
     renderHeadstockPegs();
     toast(`🎸 Tuner preset changed to: ${TUNING_PRESETS[presetKey].name}`);
   };
 
-  window.lockTunerString = function(index) {
+  window.lockTunerString = function (index) {
     if (lockedStringIndex === index) {
       lockedStringIndex = -1; // Toggle back to auto
       toast('🎯 Auto-Detect String mode enabled');
@@ -490,7 +603,7 @@
   };
 
   // Pluck reference tone to tune by ear
-  window.playReferencePitch = function(midiPitch, label) {
+  window.playReferencePitch = function (midiPitch, label) {
     if (window.playGuitarString) {
       // Use ChordCamp's Karplus-Strong physical modeling synth!
       window.playGuitarString(midiPitch, 3.2, 0, 0.35);
@@ -512,7 +625,7 @@
     }
   };
 
-  window.renderHeadstockPegs = function() {
+  window.renderHeadstockPegs = function () {
     const container = document.getElementById('headstockPegsRow');
     if (!container) return;
 

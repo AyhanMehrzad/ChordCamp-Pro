@@ -49,3 +49,4 @@ if (modified) {
 } else {
   console.log('✓ AndroidManifest.xml is already up to date with all microphone permissions.');
 }
+

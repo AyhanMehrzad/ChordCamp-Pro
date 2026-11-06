@@ -25,36 +25,31 @@
     <div class="nav-actions">
       <!-- Instrument Audio Model Switcher -->
       <div class="sound-toggle" title="Karplus-Strong physical modeling engine">
-        <button class="sound-btn active" id="btnSoundAcoustic" onclick="setGuitarSound('acoustic')">🎸 Warm Acoustic</button>
-        <button class="sound-btn" id="btnSoundElectric" onclick="setGuitarSound('electric')">⚡ Clean Electric</button>
+        <button class="sound-btn active" id="btnSoundAcoustic" onclick="setGuitarSound('acoustic')">🎸 Acoustic</button>
+        <button class="sound-btn" id="btnSoundElectric" onclick="setGuitarSound('electric')">⚡ Electric</button>
       </div>
 
       <!-- Top Capo Quick Selector -->
       <div class="capo-nav-pill" title="Set guitar capo fret">
         <span>🔒 Capo:</span>
         <select class="capo-select-nav" id="navCapoSelect" onchange="setGlobalCapo(+this.value)">
-          <option value="0">No Capo</option>
-          <option value="1">Capo 1 (+1)</option>
-          <option value="2">Capo 2 (+2)</option>
-          <option value="3">Capo 3 (+3)</option>
-          <option value="4">Capo 4 (+4)</option>
-          <option value="5">Capo 5 (+5)</option>
-          <option value="6">Capo 6 (+6)</option>
-          <option value="7">Capo 7 (+7)</option>
+          <option value="0">0 (None)</option>
+          <option value="1">Capo 1</option>
+          <option value="2">Capo 2</option>
+          <option value="3">Capo 3</option>
+          <option value="4">Capo 4</option>
+          <option value="5">Capo 5</option>
+          <option value="6">Capo 6</option>
+          <option value="7">Capo 7</option>
         </select>
       </div>
-
-      <!-- Quick Guitar Tuner Button -->
-      <button class="nav-pill nav-tuner-btn" onclick="switchHub('tuner')" title="Open Guitar Tuner">
-        🎯 <span>Tuner</span>
-      </button>
 
       <!-- 1-Tap App Update & Cache Refresh Button -->
       <button class="nav-pill nav-update-btn" onclick="forceAppUpdate()" title="Update app to latest version (Refresh cache with 1 click)">
         🔄 <span>Update</span>
       </button>
 
-      <span class="nav-pill">🔥 <b id="totalStrumCount">0</b> strums</span>
+      <span class="nav-pill nav-strum-pill hide-mobile">🔥 <b id="totalStrumCount">0</b> strums</span>
     </div>
   </header>
 
@@ -720,6 +715,27 @@
         </div>
 
         <div class="headstock-pegs-row" id="headstockPegsRow"></div>
+      </div>
+
+      <!-- Studio Tuner Guided Assistant Modal -->
+      <div class="tuner-mic-modal-backdrop" id="tunerMicModal" style="display:none" onclick="if(event.target===this)closeTunerModal()">
+        <div class="tuner-mic-card">
+          <button class="modal-close-corner" onclick="closeTunerModal()" title="Close dialog">✕</button>
+          <div class="modal-icon-badge" id="tunerModalIcon">🎤</div>
+          <h3 class="modal-headline" id="tunerModalTitle">Microphone Access Needed</h3>
+          <p class="modal-subtext" id="tunerModalDesc">
+            ChordCamp Pro needs microphone access to listen to your guitar string vibrations in real time.
+          </p>
+          <div class="modal-steps-container" id="tunerModalSteps"></div>
+          <div class="modal-actions-row">
+            <button class="btn-modal-primary" id="btnModalAction" onclick="startTuner(); closeTunerModal()">
+              🔄 Try Again
+            </button>
+            <button class="btn-modal-secondary" onclick="closeTunerModal(); switchTunerToEarMode()">
+              👂 Tune by Ear Mode
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </main>

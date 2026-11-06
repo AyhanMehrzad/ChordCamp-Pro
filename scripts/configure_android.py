@@ -48,3 +48,4 @@ def configure_android_manifest():
 
 if __name__ == '__main__':
     configure_android_manifest()
+
