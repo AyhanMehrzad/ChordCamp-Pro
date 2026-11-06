@@ -1,10 +1,10 @@
 @echo off
+setlocal
 title ChordCamp Pro - Quick Installer
 color 0A
-setlocal
 
 echo ==============================================================
-echo    CHORDCAMP PRO — QUICK WINDOWS INSTALLER
+echo    CHORDCAMP PRO - QUICK WINDOWS INSTALLER
 echo ==============================================================
 echo.
 
@@ -22,26 +22,10 @@ if not exist "%TARGET%" (
 )
 
 echo [2/3] Creating Windows Desktop Shortcut...
-cscript //nologo //e:VBScript - "%TARGET%" "%DIR%" "%ICON%" "%DESKTOP%" << "EOF"
-Set oWS = WScript.CreateObject("WScript.Shell")
-Set oLink = oWS.CreateShortcut(WScript.Arguments(3))
-oLink.TargetPath = WScript.Arguments(0)
-oLink.WorkingDirectory = WScript.Arguments(1)
-oLink.IconLocation = WScript.Arguments(2) & ", 0"
-oLink.Description = "ChordCamp Pro - Interactive Guitar Playground"
-oLink.Save
-EOF
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$ws = New-Object -ComObject WScript.Shell; $s1 = $ws.CreateShortcut('%DESKTOP%'); $s1.TargetPath = '%TARGET%'; $s1.WorkingDirectory = '%DIR%'; $s1.IconLocation = '%ICON%, 0'; $s1.Description = 'ChordCamp Pro - Interactive Guitar Playground'; $s1.Save()" >nul 2>&1
 
 echo [3/3] Creating Start Menu Shortcut...
-cscript //nologo //e:VBScript - "%TARGET%" "%DIR%" "%ICON%" "%STARTMENU%" << "EOF"
-Set oWS = WScript.CreateObject("WScript.Shell")
-Set oLink = oWS.CreateShortcut(WScript.Arguments(3))
-oLink.TargetPath = WScript.Arguments(0)
-oLink.WorkingDirectory = WScript.Arguments(1)
-oLink.IconLocation = WScript.Arguments(2) & ", 0"
-oLink.Description = "ChordCamp Pro - Interactive Guitar Playground"
-oLink.Save
-EOF
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$ws = New-Object -ComObject WScript.Shell; $s2 = $ws.CreateShortcut('%STARTMENU%'); $s2.TargetPath = '%TARGET%'; $s2.WorkingDirectory = '%DIR%'; $s2.IconLocation = '%ICON%, 0'; $s2.Description = 'ChordCamp Pro - Interactive Guitar Playground'; $s2.Save()" >nul 2>&1
 
 echo.
 echo ==============================================================
@@ -49,9 +33,5 @@ echo  SUCCESS! ChordCamp Pro desktop shortcut has been created.
 echo  You can now launch ChordCamp Pro from your Desktop or Start Menu!
 echo ==============================================================
 echo.
-set /p LAUNCH="Would you like to launch ChordCamp Pro now? (Y/N): "
-if /i "%LAUNCH%"=="Y" (
-    start "" "%TARGET%"
-)
-
+start "" "%TARGET%"
 exit /b 0

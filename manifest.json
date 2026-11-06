@@ -1,7 +1,8 @@
 {
-  "name": "ChordCamp Pro — Guitar Playground",
+  "name": "ChordCamp Pro — Interactive Guitar Studio",
   "short_name": "ChordCamp",
-  "description": "Offline interactive guitar playground, 90+ chords, metal power chords, scales, drills, and pro metronome.",
+  "version": "1.1.0",
+  "description": "Offline interactive guitar playground, 133+ chords, real-time guitar tuner, visual groove metronome, CAGED scales, and practice drills.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0a0f0b",

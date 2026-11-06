@@ -28,6 +28,7 @@ namespace ChordCampInstaller
         private CheckBox chkStartMenu;
         private CheckBox chkLaunch;
         private TextBox txtInstallPath;
+        private bool isUpgrade = false;
 
         public InstallerForm()
         {
@@ -39,6 +40,9 @@ namespace ChordCampInstaller
             this.BackColor = Color.FromArgb(13, 20, 14);
             this.ForeColor = Color.FromArgb(235, 245, 230);
             this.Font = new Font("Segoe UI", 9.5f, FontStyle.Regular);
+
+            string defaultPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ChordCamp-Pro");
+            isUpgrade = Directory.Exists(defaultPath) && File.Exists(Path.Combine(defaultPath, "index.html"));
 
             // Header Banner
             Panel pnlHeader = new Panel();
@@ -70,7 +74,6 @@ namespace ChordCampInstaller
             lblPath.AutoSize = true;
             this.Controls.Add(lblPath);
 
-            string defaultPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ChordCamp-Pro");
             txtInstallPath = new TextBox();
             txtInstallPath.Text = defaultPath;
             txtInstallPath.Location = new Point(24, 120);
@@ -82,21 +85,21 @@ namespace ChordCampInstaller
 
             // Checkboxes
             chkDesktop = new CheckBox();
-            chkDesktop.Text = "Create Desktop Shortcut (with custom rock guitar icon)";
+            chkDesktop.Text = "Create / Refresh Desktop Shortcut";
             chkDesktop.Checked = true;
             chkDesktop.Location = new Point(25, 160);
             chkDesktop.AutoSize = true;
             this.Controls.Add(chkDesktop);
 
             chkStartMenu = new CheckBox();
-            chkStartMenu.Text = "Add to Windows Start Menu Programs";
+            chkStartMenu.Text = "Add / Refresh Windows Start Menu Shortcut";
             chkStartMenu.Checked = true;
             chkStartMenu.Location = new Point(25, 190);
             chkStartMenu.AutoSize = true;
             this.Controls.Add(chkStartMenu);
 
             chkLaunch = new CheckBox();
-            chkLaunch.Text = "Launch ChordCamp Pro immediately after installation";
+            chkLaunch.Text = "Launch ChordCamp Pro immediately after update/install";
             chkLaunch.Checked = true;
             chkLaunch.Location = new Point(25, 220);
             chkLaunch.AutoSize = true;
@@ -104,9 +107,11 @@ namespace ChordCampInstaller
 
             // Status label
             lblStatus = new Label();
-            lblStatus.Text = "Ready to install.";
+            lblStatus.Text = isUpgrade 
+                ? "Existing installation detected. Ready to update in-place (no uninstall needed)!"
+                : "Ready to install.";
             lblStatus.Location = new Point(24, 252);
-            lblStatus.ForeColor = Color.FromArgb(170, 190, 165);
+            lblStatus.ForeColor = isUpgrade ? Color.FromArgb(216, 255, 101) : Color.FromArgb(170, 190, 165);
             lblStatus.AutoSize = true;
             this.Controls.Add(lblStatus);
 
@@ -119,7 +124,9 @@ namespace ChordCampInstaller
 
             // Install button
             btnInstall = new Button();
-            btnInstall.Text = "Install ChordCamp Pro";
+            btnInstall.Text = isUpgrade 
+                ? "⚡ Update / Upgrade ChordCamp Pro (v1.1.0)" 
+                : "Install ChordCamp Pro (v1.1.0)";
             btnInstall.Location = new Point(24, 300);
             btnInstall.Size = new Size(455, 38);
             btnInstall.BackColor = Color.FromArgb(216, 255, 101);
@@ -137,8 +144,19 @@ namespace ChordCampInstaller
             btnInstall.Enabled = false;
             progressBar.Visible = true;
             progressBar.Value = 10;
-            lblStatus.Text = "Preparing installation...";
+            lblStatus.Text = "Closing running instances & preparing update...";
             Application.DoEvents();
+
+            // Gracefully close any running instances so files are not locked
+            try
+            {
+                foreach (Process p in Process.GetProcessesByName("ChordCamp"))
+                {
+                    p.Kill();
+                    p.WaitForExit(1500);
+                }
+            }
+            catch { }
 
             try
             {
@@ -248,7 +266,7 @@ namespace ChordCampInstaller
                 );
 
                 progressBar.Value = 100;
-                lblStatus.Text = "Installation successful!";
+                lblStatus.Text = isUpgrade ? "Update successful!" : "Installation successful!";
 
                 if (chkLaunch.Checked && File.Exists(exePath))
                 {
@@ -256,8 +274,10 @@ namespace ChordCampInstaller
                 }
 
                 MessageBox.Show(
-                    "ChordCamp Pro has been successfully installed!\r\n\r\nEnjoy your offline guitar playground!",
-                    "Installation Complete",
+                    isUpgrade 
+                        ? "ChordCamp Pro has been updated to the latest version!\r\n\r\nAll new chords, guitar tuner, and visual metronome are ready to use."
+                        : "ChordCamp Pro has been successfully installed!\r\n\r\nEnjoy your offline guitar playground!",
+                    isUpgrade ? "Update Complete" : "Installation Complete",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information
                 );

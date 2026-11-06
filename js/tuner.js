@@ -530,3 +530,4 @@
     window.renderHeadstockPegs();
   });
 })();
+

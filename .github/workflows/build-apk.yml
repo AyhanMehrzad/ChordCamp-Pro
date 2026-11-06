@@ -61,25 +61,34 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
         with:
-          tag_name: v1.0.0
-          name: "ChordCamp Pro v1.0.0"
+          tag_name: v1.1.0
+          name: "ChordCamp Pro v1.1.0 — Studio Guitar Tuner, Visual Metronome & 133+ Chords"
           body: |
-            ## 🎸 ChordCamp Pro v1.0.0 Release
+            ## 🎸 ChordCamp Pro v1.1.0 Release
 
-            ### 📱 Mobile Installation Options:
-            1. **Instant Web App (PWA - Recommended)**:
-               Open **[https://ayhanmehrzad.github.io/ChordCamp-Pro/](https://ayhanmehrzad.github.io/ChordCamp-Pro/)** on your phone (Chrome / Safari), then tap **"Install App"** or **"Add to Home Screen"**.
-            2. **Android APK**:
-               Download `chordcamp-debug.apk` below and install directly onto your Android device with the new custom metal guitar icon!
+            ### 🚀 What's New in v1.1.0:
+            - **🎸 Studio Guitar Tuner**: Real-time microphone pitch detection with analog cents needle gauge, target guidance, and 8 tuning presets (Standard, Drop D, Half-Step Down, DADGAD, Open D, Open G, Chromatic).
+            - **🥁 Visual Groove Metronome**: Smooth mechanical pendulum, large measure beat counter with accents, live subdivision grid, and interactive beginner guitar strumming coach!
+            - **🎼 133+ Comprehensive Chords**: Added all sharp/flat voicings across C#, D#, F#, G#, A#/Bb (Major, Minor, 7ths, Maj7, m7, sus4, sus2, add9, dim7, power chords) with beginner easy shapes!
+            - **🔍 Redesigned Studio Search Toolbar**: Clean full-width search with instant clear and enharmonic matching.
+            - **⚡ Seamless 1-Click In-App Updates**: No need to uninstall or delete the app! Tap "Update App" or run `Update-Windows.bat`.
+
+            ### 📱 Android Installation:
+            1. **Instant Web App (PWA)**:
+               Open **[https://ayhanmehrzad.github.io/ChordCamp-Pro/](https://ayhanmehrzad.github.io/ChordCamp-Pro/)** on your phone (Chrome / Samsung Internet), then tap **"Install App"** or **"Add to Home screen"**. (Updates automatically in the background!)
+            2. **Native Android APK**:
+               Download `chordcamp-debug.apk` below and install directly onto your Android device.
 
             ### 🪟 Windows Desktop:
-            - **Installer (Recommended)**: Download `ChordCampSetup.exe` below for 1-click installation with automatic Desktop & Start Menu shortcuts.
-            - **Portable**: Download `ChordCamp.exe` for instant standalone app window.
+            - **Installer**: Download `ChordCampSetup.exe` below for 1-click install or in-place upgrade (no uninstall needed).
+            - **Portable**: Download `ChordCamp.exe` for the standalone native system window.
+            - **Instant Updater**: Run `Update-Windows.bat`.
           files: |
             chordcamp-debug.apk
             ChordCampSetup.exe
             ChordCamp.exe
-            install-windows.bat
+            Install-Windows.bat
+            Update-Windows.bat
             launch-windows.bat
             chordcamp.sh
           draft: false

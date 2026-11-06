@@ -2355,6 +2355,62 @@ button:active {
   color: #111a0d;
 }
 
+/* In-App Auto Update Banner & Nav Button */
+.update-banner {
+  background: linear-gradient(90deg, #182b1a 0%, #1c351f 100%);
+  border: 1.5px solid var(--lime);
+  border-radius: 14px;
+  padding: 10px 16px;
+  margin: 12px 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: 0 6px 24px rgba(216, 255, 101, 0.25);
+  animation: slideDownUpdate 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes slideDownUpdate {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.update-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #e5edd6;
+}
+.update-icon {
+  font-size: 18px;
+  color: var(--lime);
+}
+.btn-update-now {
+  background: var(--lime);
+  color: #0d140e;
+  border: 0;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font: 700 12px 'Space Grotesk', sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(216, 255, 101, 0.3);
+  transition: transform 0.15s ease;
+}
+.btn-update-now:hover {
+  transform: scale(1.04);
+}
+.nav-update-btn {
+  background: rgba(216, 255, 101, 0.1);
+  border-color: rgba(216, 255, 101, 0.25);
+  color: var(--lime);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.nav-update-btn:hover {
+  background: var(--lime);
+  color: #111a0d;
+}
+
 /* ========================================================
    FLOATING STUDIO DOCK (BALANCED CAPSULE • ZERO EMPTY VOIDS)
    ======================================================== */
