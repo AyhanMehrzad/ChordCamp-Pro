@@ -7,19 +7,85 @@ let activeChordName = 'Am';
 let activePositionIndex = 0; // 0 for Pos 1, 1 for Pos 2...
 let useEasyShapes = true;
 
-const ROOT_FILTER_LIST = ['All', 'E', 'A', 'D', 'G', 'B', 'C', 'F', 'F♯', 'C♯', 'G♯', 'D♯', 'B♭'];
+const ROOT_FILTER_LIST = ['All', 'E', 'A', 'D', 'G', 'B', 'C', 'F', 'F♯', 'C♯', 'G♯', 'D♯', 'A♯ / B♭'];
 const QUALITY_FILTER_LIST = ['All', 'Power', 'Major', 'Minor', '7th', 'Dim / Aug', 'Suspended', 'Extended'];
+
+function matchesRootFilter(chordRoot, filter) {
+  if (filter === 'All') return true;
+  if (!chordRoot) return false;
+  if (chordRoot === filter) return true;
+
+  const norm = r => r.replace(/♯/g, '#').replace(/♭/g, 'b');
+  const nRoot = norm(chordRoot);
+  const nFilter = norm(filter);
+
+  if (nRoot === nFilter) return true;
+
+  if (nFilter.includes('A#') || nFilter.includes('Bb')) {
+    return nRoot === 'A#' || nRoot === 'Bb';
+  }
+  if (nFilter.includes('C#') || nFilter.includes('Db')) {
+    return nRoot === 'C#' || nRoot === 'Db';
+  }
+  if (nFilter.includes('D#') || nFilter.includes('Eb')) {
+    return nRoot === 'D#' || nRoot === 'Eb';
+  }
+  if (nFilter.includes('F#') || nFilter.includes('Gb')) {
+    return nRoot === 'F#' || nRoot === 'Gb';
+  }
+  if (nFilter.includes('G#') || nFilter.includes('Ab')) {
+    return nRoot === 'G#' || nRoot === 'Ab';
+  }
+
+  return false;
+}
+
+function handleChordSearchInput() {
+  const input = document.getElementById('chordSearchInput');
+  const clearBtn = document.getElementById('searchClearBtn');
+  if (clearBtn && input) {
+    clearBtn.style.display = input.value.trim().length > 0 ? 'grid' : 'none';
+  }
+  renderChordGrid();
+}
+
+function clearChordSearch() {
+  const input = document.getElementById('chordSearchInput');
+  const clearBtn = document.getElementById('searchClearBtn');
+  if (input) {
+    input.value = '';
+    input.focus();
+  }
+  if (clearBtn) clearBtn.style.display = 'none';
+  renderChordGrid();
+}
+
+function resetAllFilters() {
+  activeRootFilter = 'All';
+  activeQualityFilter = 'All';
+  const input = document.getElementById('chordSearchInput');
+  const clearBtn = document.getElementById('searchClearBtn');
+  if (input) input.value = '';
+  if (clearBtn) clearBtn.style.display = 'none';
+  initChordFilters();
+  renderChordGrid();
+  toast('↺ Filters reset to show all chords');
+}
 
 function initChordFilters() {
   const rootWrap = document.getElementById('rootFilterPills');
-  rootWrap.innerHTML = ROOT_FILTER_LIST.map(r => `
-    <button class="root-pill ${r === activeRootFilter ? 'active' : ''}" onclick="setRootFilter('${r}')">${r}</button>
-  `).join('');
+  if (rootWrap) {
+    rootWrap.innerHTML = ROOT_FILTER_LIST.map(r => `
+      <button class="root-pill ${r === activeRootFilter ? 'active' : ''}" onclick="setRootFilter('${r}')">${r}</button>
+    `).join('');
+  }
 
   const qWrap = document.getElementById('qualityFilterPills');
-  qWrap.innerHTML = QUALITY_FILTER_LIST.map(q => `
-    <button class="quality-pill ${q === activeQualityFilter ? 'active' : ''}" onclick="setQualityFilter('${q}')">${q}</button>
-  `).join('');
+  if (qWrap) {
+    qWrap.innerHTML = QUALITY_FILTER_LIST.map(q => `
+      <button class="quality-pill ${q === activeQualityFilter ? 'active' : ''}" onclick="setQualityFilter('${q}')">${q}</button>
+    `).join('');
+  }
 }
 
 function setRootFilter(root) {
@@ -537,19 +603,88 @@ function playActiveChord(mode = 'strum') {
   toast(`${mode === 'arpeggio' ? '🎶 Slow Picking' : '🔊 Strumming'} ${c.name} ${capoMsg}`);
 }
 
+function matchesSearchQuery(c, rawQuery) {
+  if (!rawQuery) return true;
+  const q = rawQuery.trim().toLowerCase();
+  if (!q) return true;
+
+  const qNorm = q.replace(/♯/g, '#').replace(/♭/g, 'b');
+  const nameNorm = (c.name || '').toLowerCase().replace(/♯/g, '#').replace(/♭/g, 'b');
+  const rootNorm = (c.root || '').toLowerCase().replace(/♯/g, '#').replace(/♭/g, 'b');
+  const typeNorm = (c.type || '').toLowerCase();
+  const catNorm = (c.cat || '').toLowerCase();
+  const tipNorm = (c.tip || '').toLowerCase();
+  const levelNorm = (c.level || '').toLowerCase();
+
+  // 1. Direct or substring match
+  if (nameNorm.includes(qNorm) || rootNorm.includes(qNorm) || typeNorm.includes(qNorm) || catNorm.includes(qNorm) || tipNorm.includes(qNorm) || levelNorm.includes(qNorm)) {
+    return true;
+  }
+
+  // 2. Enharmonic cross-search: G# <-> Ab, C# <-> Db, F# <-> Gb, D# <-> Eb, A# <-> Bb
+  const enharmonicPairs = [
+    ['c#', 'db'],
+    ['d#', 'eb'],
+    ['f#', 'gb'],
+    ['g#', 'ab'],
+    ['a#', 'bb']
+  ];
+
+  for (const [s, f] of enharmonicPairs) {
+    if (qNorm.startsWith(s)) {
+      const alt = qNorm.replace(s, f);
+      if (nameNorm.includes(alt) || rootNorm.includes(alt)) return true;
+    } else if (qNorm.startsWith(f)) {
+      const alt = qNorm.replace(f, s);
+      if (nameNorm.includes(alt) || rootNorm.includes(alt)) return true;
+    }
+  }
+
+  // 3. Word conversions: "sharp" -> #, "flat" -> b, "minor" -> m, "major" -> maj
+  if (qNorm.includes('sharp')) {
+    const sQ = qNorm.replace(/sharp/g, '#').replace(/\s+/g, '');
+    if (nameNorm.includes(sQ)) return true;
+  }
+  if (qNorm.includes('flat')) {
+    const fQ = qNorm.replace(/flat/g, 'b').replace(/\s+/g, '');
+    if (nameNorm.includes(fQ)) return true;
+  }
+
+  return false;
+}
+
 function renderChordGrid() {
-  const query = (document.getElementById('chordSearchInput')?.value || '').trim().toLowerCase();
+  const query = (document.getElementById('chordSearchInput')?.value || '').trim();
   const grid = document.getElementById('chordGrid');
+  const badgeEl = document.getElementById('chordResultsBadge');
+  const resetBtn = document.getElementById('filterResetBtn');
 
   const filtered = chordDatabase.filter(c => {
-    const matchesRoot = activeRootFilter === 'All' || c.root === activeRootFilter;
+    const matchesRoot = matchesRootFilter(c.root, activeRootFilter);
     const matchesCat = activeQualityFilter === 'All' || c.cat === activeQualityFilter;
-    const matchesQuery = !query || c.name.toLowerCase().includes(query) || c.type.toLowerCase().includes(query);
+    const matchesQuery = matchesSearchQuery(c, query);
     return matchesRoot && matchesCat && matchesQuery;
   });
 
+  const hasActiveFilters = (activeRootFilter !== 'All' || activeQualityFilter !== 'All' || query.length > 0);
+  if (badgeEl) {
+    badgeEl.textContent = `${filtered.length} Chord${filtered.length === 1 ? '' : 's'}`;
+  }
+  if (resetBtn) {
+    resetBtn.style.display = hasActiveFilters ? 'inline-flex' : 'none';
+  }
+
   if (!filtered.length) {
-    grid.innerHTML = `<div style="grid-column:1/-1;padding:32px;text-align:center;color:var(--muted)">No chords match "${query || activeRootFilter}". Try selecting "All" or search C, Am, m11, or F!</div>`;
+    grid.innerHTML = `
+      <div style="grid-column:1/-1;padding:40px 20px;text-align:center;background:var(--panel);border:1px dashed var(--line-bright);border-radius:16px;margin:10px 0">
+        <div style="font-size:28px;margin-bottom:8px">🔍</div>
+        <div style="font:700 16px 'Space Grotesk';color:var(--text);margin-bottom:6px">No chords matched "${query || activeRootFilter}"</div>
+        <p style="font-size:13px;color:var(--muted);max-width:400px;margin:0 auto 16px">
+          Try searching for another root note (e.g. G#m, F#7, C#m, Cadd9, Dsus4) or clear active filters.
+        </p>
+        <button class="filter-reset-btn" onclick="resetAllFilters()" style="display:inline-block;padding:8px 18px;font-size:13px">↺ Reset All Filters</button>
+      </div>
+    `;
     return;
   }
 

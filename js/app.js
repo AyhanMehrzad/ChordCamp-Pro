@@ -20,6 +20,9 @@ function switchHub(hubId) {
     } else if (hubId === 'metronome') {
       chordNameSpan.textContent = 'Tap Beat';
       strumBtn.onclick = () => toggleMetronome();
+    } else if (hubId === 'tuner') {
+      chordNameSpan.textContent = 'Tuner Mic';
+      strumBtn.onclick = () => toggleTuner();
     } else {
       chordNameSpan.textContent = `Play ${typeof activeChordName !== 'undefined' ? activeChordName : 'Am'}`;
       strumBtn.onclick = () => playActiveChord('strum');

@@ -44,6 +44,11 @@
         </select>
       </div>
 
+      <!-- Quick Guitar Tuner Button -->
+      <button class="nav-pill nav-tuner-btn" onclick="switchHub('tuner')" title="Open Guitar Tuner">
+        🎯 <span>Tuner</span>
+      </button>
+
       <span class="nav-pill">🔥 <b id="totalStrumCount">0</b> strums</span>
     </div>
   </header>
@@ -145,18 +150,43 @@
       </div>
     </section>
 
-    <!-- Two-Tier Uncluttered Chord Filters -->
-    <section class="filter-container">
+    <!-- Redesigned High-Performance Chord Filter & Search Deck -->
+    <section class="filter-container" aria-label="Chord Library Search & Filters">
+      <!-- 1. Dedicated Search Bar Row with Live Results Counter & Reset -->
+      <div class="search-toolbar">
+        <div class="search-bar-wrap">
+          <svg class="search-icon-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input 
+            type="text" 
+            id="chordSearchInput" 
+            class="search-input" 
+            placeholder="Search any chord (e.g. G#m, F#7, C#m, Dsus4, Cadd9, Bb, m11)..." 
+            oninput="handleChordSearchInput()"
+            autocomplete="off" 
+            spellcheck="false"
+          >
+          <button class="search-clear-btn" id="searchClearBtn" onclick="clearChordSearch()" title="Clear search" style="display:none">✕</button>
+        </div>
+
+        <div class="search-meta-actions">
+          <span class="filter-results-badge" id="chordResultsBadge">133 Chords</span>
+          <button class="filter-reset-btn" id="filterResetBtn" onclick="resetAllFilters()" title="Reset all filters" style="display:none">↺ Reset</button>
+        </div>
+      </div>
+
+      <!-- 2. Root Note Selector Row -->
       <div class="root-bar-wrap">
         <span class="filter-label">Root Note:</span>
         <div class="root-pills" id="rootFilterPills"></div>
       </div>
 
+      <!-- 3. Quality / Type Selector Row -->
       <div class="quality-bar-wrap">
+        <span class="filter-label">Quality:</span>
         <div class="quality-pills" id="qualityFilterPills"></div>
-        <div class="search-box">
-          <input type="search" id="chordSearchInput" class="search-input" placeholder="Search (e.g. m11, maj9, Cadd9, F#)..." oninput="renderChordGrid()">
-        </div>
       </div>
     </section>
 
@@ -399,28 +429,70 @@
   </main>
 
   <!-- ========================================== -->
-  <!-- HUB 4: PRO METRONOME STUDIO               -->
+  <!-- HUB 4: PRO VISUAL METRONOME & RHYTHM COACH -->
   <!-- ========================================== -->
   <main class="hub-view" id="hub-metronome">
+    <!-- Optional Screen Flash Overlay for Silent Practice -->
+    <div class="metro-screen-flash" id="metroScreenFlash"></div>
+
     <div class="metronome-stage">
       <div class="metro-top">
         <div>
           <span style="font:700 11px 'Space Grotesk';color:var(--lime);text-transform:uppercase;letter-spacing:1px">Studio Rhythm Engine</span>
           <h2 style="font:700 28px 'Space Grotesk';margin:2px 0 0">Visual Groove Metronome</h2>
-        </div>
-
-        <div class="metro-display">
-          <span class="metro-bpm" id="metroBpmVal">80</span>
-          <span class="metro-bpm-unit">BPM</span>
+          <p style="font-size:13px;color:var(--muted);margin:4px 0 0">
+            Interactive visual pendulum, real-time subdivisions & beginner guitar strumming coach
+          </p>
         </div>
       </div>
 
-      <!-- Beat Bulbs Indicator -->
-      <div class="metro-beat-lights" id="metroLights">
-        <div class="beat-bulb accent"></div>
-        <div class="beat-bulb"></div>
-        <div class="beat-bulb"></div>
-        <div class="beat-bulb"></div>
+      <!-- Hero Visualizer: Physical Pendulum + BPM Dial + Big Beat Flash -->
+      <div class="metro-hero-visual-card">
+        <!-- Animated Swinging Pendulum Box -->
+        <div class="metro-pendulum-box" title="Visual mechanical pendulum swing">
+          <div class="metro-pendulum-pivot"></div>
+          <div class="metro-pendulum-arm" id="metroPendulumArm">
+            <div class="metro-pendulum-weight"></div>
+          </div>
+          <div class="metro-pendulum-arc"></div>
+        </div>
+
+        <!-- Center Display Column with Italian Markings -->
+        <div class="metro-display-column">
+          <div class="metro-bpm-hero">
+            <span class="metro-bpm" id="metroBpmVal">80</span>
+            <span class="metro-bpm-unit">BPM</span>
+          </div>
+          <div class="metro-tempo-badge">
+            <span class="tempo-italian" id="metroTempoItalian">Andante</span>
+            <span class="tempo-feel" id="metroTempoFeel">Walking Pace</span>
+          </div>
+        </div>
+
+        <!-- Big Beat Number Flash Indicator -->
+        <div class="metro-big-beat-box">
+          <span class="beat-label">MEASURE BEAT</span>
+          <div class="metro-big-beat" id="metroBigBeatNum">-</div>
+        </div>
+      </div>
+
+      <!-- Live Beat Lights & Subdivision Visualizer Grid -->
+      <div class="metro-subdiv-card">
+        <div class="subdiv-card-header">
+          <span style="font:700 11px 'Space Grotesk';text-transform:uppercase;color:var(--muted);letter-spacing:1px">Measure Beat Lights</span>
+          <span style="font-size:11px;color:var(--lime);font-weight:700">● Accent on Beat 1</span>
+        </div>
+        <div class="metro-beat-lights" id="metroLights">
+          <div class="beat-bulb accent"></div>
+          <div class="beat-bulb"></div>
+          <div class="beat-bulb"></div>
+          <div class="beat-bulb"></div>
+        </div>
+
+        <div style="margin-top:12px;font:700 11px 'Space Grotesk';text-transform:uppercase;color:var(--muted);letter-spacing:1px">
+          Subdivision Grid (Hear & See Fractional Ticks):
+        </div>
+        <div class="metro-subdiv-chips-wrap" id="metroSubdivChips"></div>
       </div>
 
       <!-- Tempo Slider -->
@@ -430,10 +502,10 @@
       <div class="metro-fine-controls">
         <button class="fine-btn" onclick="adjustBpm(-5)">-5</button>
         <button class="fine-btn" onclick="adjustBpm(-1)">-1</button>
-        <button class="fine-btn" onclick="setBpmPreset(60)">60</button>
-        <button class="fine-btn" onclick="setBpmPreset(80)">80</button>
-        <button class="fine-btn" onclick="setBpmPreset(105)">105</button>
-        <button class="fine-btn" onclick="setBpmPreset(120)">120</button>
+        <button class="fine-btn" onclick="setBpmPreset(60)">60 (Largo)</button>
+        <button class="fine-btn" onclick="setBpmPreset(80)">80 (Andante)</button>
+        <button class="fine-btn" onclick="setBpmPreset(105)">105 (Groove)</button>
+        <button class="fine-btn" onclick="setBpmPreset(120)">120 (Allegro)</button>
         <button class="fine-btn" onclick="adjustBpm(+1)">+1</button>
         <button class="fine-btn" onclick="adjustBpm(+5)">+5</button>
       </div>
@@ -443,11 +515,11 @@
         <div class="metro-option-card">
           <label for="metroTimeSig">Time Signature</label>
           <select class="metro-select" id="metroTimeSig" onchange="updateTimeSig()">
-            <option value="4">4/4 (Standard)</option>
-            <option value="3">3/4 (Waltz)</option>
-            <option value="2">2/4 (March)</option>
-            <option value="6">6/8 (Slow Blues)</option>
-            <option value="5">5/4 (Dave Brubeck)</option>
+            <option value="4">4/4 (Standard Pop/Rock)</option>
+            <option value="3">3/4 (Waltz & Country)</option>
+            <option value="2">2/4 (March & Polka)</option>
+            <option value="6">6/8 (Slow Blues & Ballad)</option>
+            <option value="5">5/4 (Dave Brubeck / Prog)</option>
             <option value="7">7/8 (Prog Rock)</option>
           </select>
         </div>
@@ -456,9 +528,9 @@
           <label for="metroSubdiv">Subdivision & Feel</label>
           <select class="metro-select" id="metroSubdiv" onchange="updateSubdiv()">
             <option value="1">Quarter Notes (1 2 3 4)</option>
-            <option value="2">8th Notes (1 & 2 &)</option>
-            <option value="4">16th Notes (1 e & a)</option>
-            <option value="3">Triplets (1 trip let)</option>
+            <option value="2">8th Notes (1 & 2 & 3 & 4 &)</option>
+            <option value="4">16th Notes (1 e & a 2 e & a)</option>
+            <option value="3">Triplets (1 trip let 2 trip let)</option>
             <option value="swing">Swing / Shuffle Feel</option>
           </select>
         </div>
@@ -474,6 +546,24 @@
         </div>
       </div>
 
+      <!-- Beginner Strumming Pattern Coach -->
+      <div class="metro-strum-coach-card">
+        <div class="strum-coach-header">
+          <div>
+            <strong style="color:var(--lime);font-size:14px">🎸 Beginner Strumming Coach</strong>
+            <div style="font-size:12px;color:var(--muted)">Watch the highlighted arrows and strum in perfect synchrony with your guitar!</div>
+          </div>
+          <select class="metro-select" id="strumPresetSelect" onchange="setStrumPreset(this.value)" style="width:auto">
+            <option value="pop">Pop / Rock (D - D U - U D U)</option>
+            <option value="folk">Folk & Campfire (D - D U D - D U)</option>
+            <option value="rock8th">Driving 8ths (D D D D D D D D)</option>
+            <option value="waltz">3/4 Waltz (D - D - D)</option>
+            <option value="blues68">6/8 Slow Blues (D . . D . .)</option>
+          </select>
+        </div>
+        <div class="metro-strum-track" id="metroStrummingTrack"></div>
+      </div>
+
       <!-- Speed Ladder (Tempo Ramp Trainer) -->
       <div class="ladder-box">
         <div>
@@ -486,15 +576,136 @@
         </label>
       </div>
 
+      <!-- Practice Advice & Silent Flash Toggle -->
+      <div class="metro-coach-footer-card">
+        <div class="metro-coach-content">
+          <span style="font-size:20px">💡</span>
+          <div id="metroCoachText">Classic acoustic guitar tempo. Great for campfire strumming, folk, and pop ballads.</div>
+        </div>
+        <button class="btn-toggle-flash" id="btnToggleFlash" onclick="toggleVisualFlash()" title="Toggle visual screen pulse on every beat for silent practice">
+          ⚡ Screen Pulse Flash
+        </button>
+      </div>
+
       <!-- Main Start / Stop & Tap Tempo Buttons -->
       <div class="metro-main-btns">
         <button class="metro-play-btn" id="btnMetroToggle" onclick="toggleMetronome()">
           <span id="metroIcon">▶</span>
           <span id="metroBtnLabel">Start Metronome</span>
         </button>
-        <button class="tap-tempo-btn" onclick="handleTapTempo()">
+        <button class="tap-tempo-btn" id="btnTapTempo" onclick="handleTapTempo()">
           🥁 Tap Tempo
         </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- HUB 5: STUDIO GUITAR TUNER                               -->
+  <!-- ======================================================== -->
+  <main class="hub-view" id="hub-tuner">
+    <div class="tuner-stage">
+      <!-- Tuner Top Bar -->
+      <div class="tuner-header">
+        <div>
+          <span class="hub-badge" style="color:var(--lime);font:700 11px 'Space Grotesk';text-transform:uppercase;letter-spacing:1px">Precision Studio Tuner</span>
+          <h2 style="font:700 28px 'Space Grotesk';margin:2px 0 0">Real-Time Guitar Tuner</h2>
+          <p style="font-size:13px;color:var(--muted);margin:4px 0 0">
+            Real-time microphone pitch detection & Karplus-Strong ear reference tones
+          </p>
+        </div>
+
+        <!-- Preset Selector Dropdown -->
+        <div class="tuner-preset-select-wrap">
+          <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Tuning:</span>
+          <select class="metro-select tuner-select" id="tunerPresetSelect" onchange="setTuningPreset(this.value)">
+            <option value="standard">🎸 Standard (E A D G B E)</option>
+            <option value="drop_d">⚡ Drop D (D A D G B E)</option>
+            <option value="half_down">🎸 Half-Step Down / E♭ (Hendrix / SRV)</option>
+            <option value="full_down">🎸 Full Step Down / D (D G C F A D)</option>
+            <option value="dadgad">🎸 DADGAD (Celtic / Kashmir)</option>
+            <option value="open_d">🎸 Open D (D A D F♯ A D)</option>
+            <option value="open_g">🎸 Open G (Rolling Stones / Keith)</option>
+            <option value="chromatic">🌐 Chromatic (All 12 Notes)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Tuner Gauge Card -->
+      <div class="tuner-dial-card" id="tunerDialCard">
+        <!-- Live Status Pill -->
+        <div class="tuner-status-pill" id="tunerStatusPill">
+          Mic off • Tap Start Tuner to begin
+        </div>
+
+        <!-- Big Pitch Note Display -->
+        <div class="tuner-note-hero">
+          <span class="tuner-note-name" id="tunerNoteDisplay">E</span>
+          <span class="tuner-octave-badge" id="tunerOctaveDisplay">2</span>
+        </div>
+
+        <!-- Cents Deviation Readout -->
+        <div class="tuner-cents-hero" id="tunerCentsVal">0 ¢</div>
+
+        <!-- Precision Analog Dial Gauge -->
+        <div class="tuner-meter-wrap">
+          <div class="tuner-gauge-arc">
+            <!-- Scale tick marks -->
+            <div class="gauge-ticks">
+              <span class="tick left-extreme" title="-50 cents">-50</span>
+              <span class="tick left-mid" title="-25 cents">-25</span>
+              <span class="tick center" title="0 in tune">0</span>
+              <span class="tick right-mid" title="+25 cents">+25</span>
+              <span class="tick right-extreme" title="+50 cents">+50</span>
+            </div>
+            <!-- Target In-Tune Zone indicator -->
+            <div class="in-tune-zone"></div>
+            <!-- Dynamic Needle -->
+            <div class="tuner-needle" id="tunerNeedle">
+              <div class="needle-bob"></div>
+            </div>
+            <div class="needle-pivot"></div>
+          </div>
+        </div>
+
+        <!-- Frequency Readouts & Audio Volume Bar -->
+        <div class="tuner-stats-grid">
+          <div class="tuner-stat-box">
+            <span class="stat-title">Detected Pitch</span>
+            <strong class="stat-val" id="tunerLiveFreq">-- Hz</strong>
+          </div>
+          <div class="tuner-stat-box">
+            <span class="stat-title">Target Pitch</span>
+            <strong class="stat-val" id="tunerTargetFreq">82.4 Hz</strong>
+          </div>
+          <div class="tuner-stat-box">
+            <span class="stat-title">Input Signal</span>
+            <div class="tuner-vol-track">
+              <div class="tuner-vol-bar" id="tunerVolumeBar"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Tuner Toggle Button -->
+        <div class="tuner-action-row">
+          <button class="btn-tuner-main" id="btnTunerToggle" onclick="toggleTuner()">
+            ▶ Start Microphone Tuner
+          </button>
+        </div>
+      </div>
+
+      <!-- Guitar Headstock & String Reference Section (Tune By Ear) -->
+      <div class="tuner-headstock-card">
+        <div class="headstock-header">
+          <div>
+            <h3 style="margin:0;font:700 16px 'Space Grotesk';color:var(--text)">🎸 Interactive String Pegs & Tune by Ear</h3>
+            <p style="margin:4px 0 0;font-size:12px;color:var(--muted)">
+              Tap any peg to lock detection, or tap <strong>Hear</strong> to listen to the acoustic reference pitch!
+            </p>
+          </div>
+        </div>
+
+        <div class="headstock-pegs-row" id="headstockPegsRow"></div>
       </div>
     </div>
   </main>
@@ -508,6 +719,10 @@
     <button class="dock-hub-btn active" data-dock="chords" onclick="switchHub('chords')">
       <span>🎸</span>
       <span class="label">Chords</span>
+    </button>
+    <button class="dock-hub-btn" data-dock="tuner" onclick="switchHub('tuner')">
+      <span>🎯</span>
+      <span class="label">Tuner</span>
     </button>
     <button class="dock-hub-btn" data-dock="modes" onclick="switchHub('modes')">
       <span>🧪</span>
@@ -630,6 +845,7 @@
   <script src="js/fretboard.js"></script>
   <script src="js/drills.js"></script>
   <script src="js/metronome.js"></script>
+  <script src="js/tuner.js"></script>
   <script src="js/app.js"></script>
 
   <!-- PWA Offline Service Worker Registration -->
