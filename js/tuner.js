@@ -337,6 +337,41 @@
     if (needleEl) needleEl.classList.remove('in-tune');
   }
 
+  let activeMicLabel = 'System Default Microphone';
+
+  function updateActiveMicBadge(label, isActive) {
+    const badge = document.getElementById('tunerActiveMicBadge');
+    const textEl = document.getElementById('tunerActiveMicText');
+    if (!badge || !textEl) return;
+    activeMicLabel = label || 'System Default';
+    textEl.textContent = '🎤 Mic: ' + activeMicLabel;
+    badge.classList.toggle('active-source', !!isActive);
+  }
+
+  async function detectDefaultSystemMicrophone() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+      return null;
+    }
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const audioInputs = devices.filter(d => d.kind === 'audioinput');
+      if (audioInputs.length === 0) {
+        return { count: 0, defaultDevice: null, list: [] };
+      }
+      // System default microphone resolution:
+      // 1. Device with id 'default'
+      // 2. Device labeled with 'default'
+      // 3. First audio input device
+      let defDev = audioInputs.find(d => d.deviceId === 'default') ||
+                   audioInputs.find(d => d.label && d.label.toLowerCase().includes('default')) ||
+                   audioInputs[0];
+      return { count: audioInputs.length, defaultDevice: defDev, list: audioInputs };
+    } catch (e) {
+      console.warn('Could not enumerate audio devices:', e);
+      return null;
+    }
+  }
+
   function highlightTunerString(strIdx) {
     document.querySelectorAll('.headstock-peg-btn').forEach((peg, idx) => {
       peg.classList.toggle('active-peg', idx === strIdx);
@@ -352,11 +387,20 @@
     const statusPill = document.getElementById('tunerStatusPill');
 
     try {
+      // 1. Detect and resolve default system microphone
+      const detected = await detectDefaultSystemMicrophone();
+      if (detected && detected.count === 0) {
+        throw { name: 'NotFoundError', message: 'No audio input hardware connected to this system.' };
+      }
+
+      const targetDeviceId = detected && detected.defaultDevice && detected.defaultDevice.deviceId ? detected.defaultDevice.deviceId : 'default';
+
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         try {
-          // First try high-fidelity raw guitar audio (no voice-cancellation filtering)
+          // First try high-fidelity raw guitar audio bound to the system default microphone
           micStream = await navigator.mediaDevices.getUserMedia({
             audio: {
+              deviceId: { ideal: targetDeviceId },
               echoCancellation: false,
               noiseSuppression: false,
               autoGainControl: false
@@ -364,12 +408,24 @@
           });
         } catch (constraintErr) {
           console.warn('Raw audio constraints not supported by device, falling back to basic mic:', constraintErr);
-          // Universal Android / Mobile fallback
-          micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          // Universal Android / Mobile fallback bound to default system microphone
+          micStream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+              deviceId: { ideal: targetDeviceId }
+            }
+          });
         }
       } else {
         alert("Microphone access is not supported by your current environment. You can still use 'Tune by Ear' mode below!");
         return;
+      }
+
+      // Update microphone label from actual active track
+      const audioTracks = micStream.getAudioTracks();
+      if (audioTracks.length > 0) {
+        const track = audioTracks[0];
+        const label = track.label || (detected && detected.defaultDevice && detected.defaultDevice.label) || 'System Default Microphone';
+        updateActiveMicBadge(label, true);
       }
 
       const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -571,6 +627,7 @@
     if (dialCard) dialCard.classList.remove('glow-in-tune');
     updateVolumeMeter(0);
     highlightTunerString(-1);
+    updateActiveMicBadge(activeMicLabel, false);
   };
 
   window.toggleTuner = function () {
@@ -654,6 +711,28 @@
   // Initialize on load
   document.addEventListener('DOMContentLoaded', () => {
     window.renderHeadstockPegs();
+
+    // Probe system default microphone on startup
+    detectDefaultSystemMicrophone().then(res => {
+      if (res && res.defaultDevice && res.defaultDevice.label) {
+        updateActiveMicBadge(res.defaultDevice.label, false);
+      } else {
+        updateActiveMicBadge('System Default (Ready)', false);
+      }
+    }).catch(() => {
+      updateActiveMicBadge('System Default', false);
+    });
+
+    // Auto-detect when microphones or headsets are plugged/unplugged
+    if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) {
+      navigator.mediaDevices.addEventListener('devicechange', async () => {
+        const res = await detectDefaultSystemMicrophone();
+        if (res && res.defaultDevice && res.defaultDevice.label) {
+          console.log('🎤 Default system microphone updated:', res.defaultDevice.label);
+          updateActiveMicBadge(res.defaultDevice.label, isTuningActive);
+        }
+      });
+    }
   });
 })();
 
