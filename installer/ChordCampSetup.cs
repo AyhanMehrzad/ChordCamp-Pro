@@ -125,8 +125,8 @@ namespace ChordCampInstaller
             // Install button
             btnInstall = new Button();
             btnInstall.Text = isUpgrade 
-                ? "⚡ Update / Upgrade ChordCamp Pro (v1.1.0)" 
-                : "Install ChordCamp Pro (v1.1.0)";
+                ? "⚡ Update / Upgrade ChordCamp Pro (v2.1.0)" 
+                : "Install ChordCamp Pro (v2.1.0)";
             btnInstall.Location = new Point(24, 300);
             btnInstall.Size = new Size(455, 38);
             btnInstall.BackColor = Color.FromArgb(216, 255, 101);

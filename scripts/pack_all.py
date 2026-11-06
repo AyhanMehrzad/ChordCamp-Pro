@@ -118,3 +118,4 @@ if __name__ == '__main__':
     step3_create_payload_zip()
     step4_compile_setup_installer()
     print("\n✨ ALL COMPILED FILES FOR PC & ANDROID PREPARED AND UPDATED SUCCESSFULLY! ✨\n")
+

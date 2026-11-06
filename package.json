@@ -1,6 +1,6 @@
 {
   "name": "chordcamp-pro",
-  "version": "1.1.0",
+  "version": "2.1.0",
   "description": "Offline interactive guitar playground, 133+ chords, studio guitar tuner, visual groove metronome, CAGED positions, and practice drills.",
   "main": "index.html",
   "scripts": {
