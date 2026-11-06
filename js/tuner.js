@@ -353,13 +353,20 @@
 
     try {
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        micStream = await navigator.mediaDevices.getUserMedia({
-          audio: {
-            echoCancellation: false,
-            noiseSuppression: false,
-            autoGainControl: false
-          }
-        });
+        try {
+          // First try high-fidelity raw guitar audio (no voice-cancellation filtering)
+          micStream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+              echoCancellation: false,
+              noiseSuppression: false,
+              autoGainControl: false
+            }
+          });
+        } catch (constraintErr) {
+          console.warn('Raw audio constraints not supported by device, falling back to basic mic:', constraintErr);
+          // Universal Android / Mobile fallback
+          micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        }
       } else {
         alert("Microphone access is not supported by your current environment. You can still use 'Tune by Ear' mode below!");
         return;
@@ -367,6 +374,12 @@
 
       const AudioContextClass = window.AudioContext || window.webkitAudioContext;
       audioCtx = new AudioContextClass();
+
+      // Ensure AudioContext is active (required on Android and modern WebViews)
+      if (audioCtx.state === 'suspended') {
+        await audioCtx.resume();
+      }
+
       sourceNode = audioCtx.createMediaStreamSource(micStream);
 
       // Low-pass / bandpass filter to isolate guitar frequencies

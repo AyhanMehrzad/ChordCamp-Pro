@@ -34,10 +34,11 @@ jobs:
           npm install
           node scripts/prepare-dist.js
 
-      - name: Add Capacitor Android Platform & Apply Custom Metal App Icons
+      - name: Add Capacitor Android Platform, Configure Microphone & Apply Custom Metal App Icons
         run: |
           npx cap add android
           cp -r assets/android-res/* android/app/src/main/res/
+          node scripts/configure-android.js
           npx cap sync android
 
       - name: Build Android Debug APK

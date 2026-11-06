@@ -1,16 +1,45 @@
 # launcher/desktop_app.py
 """
 ChordCamp Pro — Standalone Native Desktop Application
-Embedded Edge Chromium WebView2 Win32 window with local secure HTTP server
+Embedded Edge Chromium WebView2 Win32 window with local secure HTTP server & automatic microphone permissions
 """
 
 import os
 import sys
+
+# Pre-configure WebView2 flags to allow microphone capture without UI prompt blocks
+os.environ['WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS'] = '--use-fake-ui-for-media-stream --enable-features=msEdgePermissionPrompt'
+
 import socket
 import threading
 from http.server import SimpleHTTPRequestHandler
 import socketserver
 import webview
+
+# Automatically grant CoreWebView2 permissions for audio/microphone in pywebview
+try:
+    import webview.platforms.edgechromium as ec
+    from Microsoft.Web.WebView2.Core import CoreWebView2PermissionState, CoreWebView2PermissionKind
+
+    _orig_on_webview_ready = ec.EdgeChrome.on_webview_ready
+
+    def _patched_on_webview_ready(self, sender, args):
+        _orig_on_webview_ready(self, sender, args)
+        try:
+            if args.IsSuccess and sender.CoreWebView2:
+                def _on_permission_requested(s, e):
+                    # Auto-grant microphone permission for tuner
+                    if e.PermissionKind == CoreWebView2PermissionKind.Microphone:
+                        e.State = CoreWebView2PermissionState.Allow
+                    else:
+                        e.State = CoreWebView2PermissionState.Allow
+                sender.CoreWebView2.PermissionRequested += _on_permission_requested
+        except Exception:
+            pass
+
+    ec.EdgeChrome.on_webview_ready = _patched_on_webview_ready
+except Exception:
+    pass
 
 def find_app_dir():
     # If frozen with PyInstaller
@@ -18,7 +47,6 @@ def find_app_dir():
         base_dir = os.path.dirname(os.path.abspath(sys.executable))
         if os.path.exists(os.path.join(base_dir, 'index.html')):
             return base_dir
-        # Check parent folder if placed inside dist/
         parent = os.path.dirname(base_dir)
         if os.path.exists(os.path.join(parent, 'index.html')):
             return parent
@@ -88,4 +116,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

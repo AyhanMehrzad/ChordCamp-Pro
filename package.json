@@ -9,8 +9,8 @@
     "update": "Update-Windows.bat",
     "build": "python scripts/pack_all.py",
     "build:exe": "python -m PyInstaller --noconsole --onefile --icon=assets/ChordCamp.ico --name=ChordCamp launcher/desktop_app.py",
-    "cap:add": "npx cap add android",
-    "cap:sync": "npx cap sync android",
+    "cap:add": "npx cap add android && node scripts/configure-android.js",
+    "cap:sync": "node scripts/configure-android.js && npx cap sync android",
     "cap:open": "npx cap open android",
     "build:apk": "npx cap sync android && cd android && gradlew.bat assembleRelease"
   },
